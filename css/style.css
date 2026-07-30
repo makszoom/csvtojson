@@ -523,10 +523,14 @@ main.container {
     background: rgba(0,0,0,0.4);
     backdrop-filter: blur(8px) saturate(180%);
     -webkit-backdrop-filter: blur(8px) saturate(180%);
-    display: flex !important;
+    display: none;
     align-items: center;
     justify-content: center;
     z-index: 1000;
+}
+
+.modal.open {
+    display: flex;
     opacity: 0;
     animation: modalOverlayIn 0.25s ease forwards;
 }
