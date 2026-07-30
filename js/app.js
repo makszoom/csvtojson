@@ -401,17 +401,17 @@ els.downloadBtn.addEventListener('click', () => {
 
 // ─── Paywall (placeholder — Day 6 full implementation) ───
 function showPaywall() {
-    els.paywallModal.style.display = 'block';
+    els.paywallModal.classList.add('open');
 }
 
 els.paywallClose.addEventListener('click', () => {
-    els.paywallModal.style.display = 'none';
+    els.paywallModal.classList.remove('open');
 });
 
 // Close modal on backdrop click
 els.paywallModal.addEventListener('click', (e) => {
     if (e.target === els.paywallModal) {
-        els.paywallModal.style.display = 'none';
+        els.paywallModal.classList.remove('open');
     }
 });
 
