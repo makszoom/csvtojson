@@ -348,6 +348,26 @@ main.container {
     outline: none;
 }
 
+.preview-table th .json-path-input {
+    font-size: 0.7rem;
+    padding: 2px 6px;
+    border: 1px solid var(--border-soft);
+    border-radius: 4px;
+    background: var(--bg);
+    color: var(--accent);
+    width: 100%;
+    min-width: 80px;
+    font-family: var(--font-mono);
+    margin-top: 4px;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.preview-table th .json-path-input:focus {
+    border-color: var(--accent);
+    outline: none;
+    background: var(--accent-soft);
+}
+
 .preview-table td {
     padding: 8px 12px;
     border-bottom: 1px solid var(--border-soft);
@@ -360,6 +380,19 @@ main.container {
 
 .preview-table tr:last-child td { border-bottom: none; }
 .preview-table tr:hover td { background: var(--bg-soft); }
+
+/* ─── Mapping Controls ─── */
+.mapping-controls {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+    flex-wrap: wrap;
+}
+
+.btn-mapping {
+    font-size: 0.8rem;
+    padding: 6px 12px;
+}
 
 /* ─── Convert Action ─── */
 .convert-action {
