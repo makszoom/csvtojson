@@ -103,10 +103,24 @@
                     </select>
                 </div>
                 <div class="setting-item">
+                    <label for="quoteHandling">Quote Handling</label>
+                    <select id="quoteHandling">
+                        <option value="true">Auto (respect quoted fields)</option>
+                        <option value="false">Strict (no special quote handling)</option>
+                    </select>
+                </div>
+                <div class="setting-item">
                     <label for="nestedMapping">Nested Mapping</label>
                     <select id="nestedMapping">
                         <option value="false">Flat keys (default)</option>
                         <option value="true">Dot-notation → nested objects</option>
+                    </select>
+                </div>
+                <div class="setting-item">
+                    <label for="skipEmpty">Skip Empty Lines</label>
+                    <select id="skipEmpty">
+                        <option value="true">Yes (skip blank lines)</option>
+                        <option value="false">No (keep empty rows)</option>
                     </select>
                 </div>
             </div>
@@ -115,6 +129,7 @@
         <!-- Preview Table (hidden until parsed) -->
         <div class="preview-section" id="previewSection" style="display:none;">
             <h3 class="section-title">Preview <span class="preview-count" id="previewCount"></span></h3>
+            <p class="preview-hint">Set column types for precise JSON output:</p>
             <div class="table-wrapper">
                 <table class="preview-table" id="previewTable"></table>
             </div>
