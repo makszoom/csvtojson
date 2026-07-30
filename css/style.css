@@ -393,6 +393,36 @@ main.container {
 /* ─── Output ─── */
 .output-section { margin-top: 24px; }
 
+/* ─── Progress Bar ─── */
+.progress-bar-section {
+    margin-top: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.progress-bar {
+    flex: 1;
+    height: 4px;
+    background: var(--bg-muted);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 2px;
+    width: 0%;
+    transition: width 0.3s ease;
+}
+
+.progress-text {
+    font-size: 0.85rem;
+    color: var(--muted);
+    white-space: nowrap;
+}
+
 .output-header {
     display: flex;
     justify-content: space-between;
