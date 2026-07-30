@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSV to JSON Converter — Free Online, No Upload | Privacy-First</title>
+    <meta name="description" content="Convert CSV to JSON in your browser. No upload, no registration. Nested JSON mapping, batch processing, smart type detection. $5 lifetime.">
+    <link rel="canonical" href="https://csvtojson.app/">
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="CSV to JSON Converter — Free Online, No Upload">
+    <meta property="og:description" content="Convert CSV to JSON in your browser. Nested mapping, batch, privacy-first. $5 lifetime.">
+    <meta property="og:url" content="https://csvtojson.app/">
+    <meta property="og:type" content="website">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="CSV to JSON Converter — Free Online, No Upload">
+    <meta name="twitter:description" content="Convert CSV to JSON in your browser. Nested mapping, batch, privacy-first. $5 lifetime.">
+
+    <!-- PapaParse CDN -->
+    <script src="https://unpkg.com/papaparse@5.4.1/papaparse.min.js"></script>
+    <!-- JSZip CDN -->
+    <script src="https://unpkg.com/jszip@3.10.1/dist/jszip.min.js"></script>
+    <!-- highlight.js CDN (JSON only) -->
+    <link rel="stylesheet" href="https://unpkg.com/@highlightjs/cdn-assets@11.9.0/styles/github.min.css">
+    <script src="https://unpkg.com/@highlightjs/cdn-assets@11.9.0/lib/core.min.js"></script>
+    <script src="https://unpkg.com/@highlightjs/cdn-assets@11.9.0/languages/json.min.js"></script>
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- ═══════ HEADER ═══════ -->
+    <header class="header">
+        <div class="container header-inner">
+            <a href="index.html" class="logo">
+                <span class="logo-icon">📋</span>
+                <span class="logo-text">CSV<span class="logo-accent">→</span>JSON</span>
+            </a>
+            <div class="header-badges">
+                <span class="badge badge-free">Free</span>
+                <span class="badge badge-privacy">No Upload</span>
+                <span class="badge badge-browser">Browser-Only</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- ═══════ HERO ═══════ -->
+    <section class="hero">
+        <div class="container">
+            <h1>Convert CSV to JSON<br><span class="hero-accent">In Your Browser</span></h1>
+            <p class="hero-subtitle">No upload. No registration. Your data never leaves your device. Nested JSON mapping, batch processing, smart type detection.</p>
+        </div>
+    </section>
+
+    <!-- ═══════ MAIN TOOL ═══════ -->
+    <main class="container">
+        <!-- Drop Zone -->
+        <div class="drop-zone" id="dropZone">
+            <input type="file" id="fileInput" accept=".csv,.txt,.tsv" multiple hidden>
+            <div class="drop-zone-content">
+                <div class="drop-zone-icon">📄</div>
+                <p class="drop-zone-text">Drop CSV file here</p>
+                <p class="drop-zone-subtext">or click to browse · supports multiple files for batch</p>
+            </div>
+        </div>
+
+        <!-- File List (hidden until files loaded) -->
+        <div class="file-list-section" id="fileListSection" style="display:none;">
+            <div class="file-list-header">
+                <span class="file-list-title">Files (<span id="fileCount">0</span>)</span>
+                <button class="btn-text btn-clear" id="clearAllBtn">Clear all</button>
+            </div>
+            <div class="file-list" id="fileList"></div>
+        </div>
+
+        <!-- Settings Panel (hidden until file loaded) -->
+        <div class="settings-panel" id="settingsPanel" style="display:none;">
+            <h3 class="settings-title">Conversion Settings</h3>
+            <div class="settings-grid">
+                <div class="setting-item">
+                    <label for="delimiter">Delimiter</label>
+                    <select id="delimiter">
+                        <option value="auto">Auto-detect</option>
+                        <option value=",">Comma (,)</option>
+                        <option value="\t">Tab</option>
+                        <option value=";">Semicolon (;)</option>
+                        <option value="|">Pipe (|)</option>
+                    </select>
+                </div>
+                <div class="setting-item">
+                    <label for="headerRow">Header Row</label>
+                    <select id="headerRow">
+                        <option value="true">First row = keys</option>
+                        <option value="false">No header (array of arrays)</option>
+                    </select>
+                </div>
+                <div class="setting-item">
+                    <label for="typeDetection">Type Detection</label>
+                    <select id="typeDetection">
+                        <option value="true">Auto (numbers, booleans, null)</option>
+                        <option value="false">All strings</option>
+                    </select>
+                </div>
+                <div class="setting-item">
+                    <label for="nestedMapping">Nested Mapping</label>
+                    <select id="nestedMapping">
+                        <option value="false">Flat keys (default)</option>
+                        <option value="true">Dot-notation → nested objects</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Preview Table (hidden until parsed) -->
+        <div class="preview-section" id="previewSection" style="display:none;">
+            <h3 class="section-title">Preview <span class="preview-count" id="previewCount"></span></h3>
+            <div class="table-wrapper">
+                <table class="preview-table" id="previewTable"></table>
+            </div>
+        </div>
+
+        <!-- Convert Button -->
+        <div class="convert-action" id="convertAction" style="display:none;">
+            <button class="btn-primary btn-convert" id="convertBtn">
+                <span class="btn-text-label">Convert to JSON</span>
+            </button>
+            <span class="counter" id="counter">Free conversions left: <strong>5</strong>/5</span>
+        </div>
+
+        <!-- Output (hidden until converted) -->
+        <div class="output-section" id="outputSection" style="display:none;">
+            <div class="output-header">
+                <h3 class="section-title">JSON Output</h3>
+                <div class="output-actions">
+                    <button class="btn-secondary btn-copy" id="copyBtn">Copy</button>
+                    <button class="btn-secondary btn-download" id="downloadBtn">Download .json</button>
+                </div>
+            </div>
+            <pre class="output-code"><code id="jsonOutput" class="language-json"></code></pre>
+        </div>
+    </main>
+
+    <!-- ═══════ FEATURES ═══════ -->
+    <section class="features-section">
+        <div class="container">
+            <h2 class="section-title-center">Why CSV→JSON?</h2>
+            <div class="features-grid">
+                <div class="feature">
+                    <div class="feature-icon">🔒</div>
+                    <h3>100% Private</h3>
+                    <p>Your CSV files never leave your browser. Zero upload. Works offline after page load.</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">🗂️</div>
+                    <h3>Nested JSON Mapping</h3>
+                    <p>Convert flat columns like <code>address.city</code> into nested JSON objects. No competitor does this.</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">📦</div>
+                    <h3>Batch Processing</h3>
+                    <p>Drop multiple CSV files at once. Download all as ZIP or merge into one JSON array.</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">⚡</div>
+                    <h3>Instant & Free</h3>
+                    <p>5 free conversions, no registration. Lifetime license $5 for unlimited use. No subscription.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════ FAQ ═══════ -->
+    <section class="faq-section">
+        <div class="container">
+            <h2 class="section-title-center">FAQ</h2>
+            <div class="faq-list">
+                <details class="faq-item">
+                    <summary>Is my data safe?</summary>
+                    <p>Yes. All processing happens in your browser using Web Workers. Your CSV data is never uploaded to any server. Zero network requests after the page loads.</p>
+                </details>
+                <details class="faq-item">
+                    <summary>What is nested JSON mapping?</summary>
+                    <p>Instead of flat keys like <code>{"address.city": "Moscow"}</code>, you get nested objects: <code>{"address": {"city": "Moscow"}}</code>. Enable it in Settings → Nested Mapping → Dot-notation.</p>
+                </details>
+                <details class="faq-item">
+                    <summary>How much does it cost?</summary>
+                    <p>5 free conversions with full functionality. After that, a one-time $5 payment (USDT TRC-20) gives you unlimited lifetime access. No subscription, no recurring fees.</p>
+                </details>
+                <details class="faq-item">
+                    <summary>What file sizes are supported?</summary>
+                    <p>Files up to 50MB work smoothly thanks to Web Workers (non-blocking UI). For larger files, you may experience slower parsing but it still works.</p>
+                </details>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════ FOOTER ═══════ -->
+    <footer class="footer">
+        <div class="container">
+            <p class="footer-text">CSV→JSON Converter · Browser-side · Privacy-First · <a href="index.html">Home</a></p>
+        </div>
+    </footer>
+
+    <!-- ═══════ PAYWALL MODAL (hidden by default) ═══════ -->
+    <div class="modal" id="paywallModal" style="display:none;">
+        <div class="modal-content">
+            <button class="payment-close" id="paywallClose">✕</button>
+            <div class="paywall-body">
+                <div class="paywall-icon">🔓</div>
+                <h2 class="paywall-title">Unlock Unlimited Conversions</h2>
+                <p class="paywall-subtitle">You've used 5 free conversions. Get lifetime access for $5.</p>
+                <div class="price-card">
+                    <div class="price-amount">$5</div>
+                    <div class="price-label">Lifetime License</div>
+                    <div class="price-note">One-time payment · No subscription</div>
+                </div>
+                <div class="payment-network">⚡ USDT TRC-20 (Tron Network)</div>
+                <div class="payment-qr" id="paymentQR"></div>
+                <div class="payment-address-group">
+                    <label class="payment-label">Send USDT to this address:</label>
+                    <div class="address-row">
+                        <input type="text" class="address-input" id="paymentAddress" readonly>
+                        <button class="btn-copy-address" id="copyAddressBtn">Copy</button>
+                    </div>
+                </div>
+                <div class="payment-txid-group">
+                    <label class="payment-label">After sending, paste your transaction ID (TXID):</label>
+                    <input type="text" class="txid-input" id="txidInput" placeholder="e.g. a1b2c3d4...">
+                    <button class="btn-primary btn-verify" id="verifyBtn">Verify Payment</button>
+                </div>
+                <div class="payment-status" id="paymentStatus"></div>
+                <p class="payment-wait">⏱ Wait 30-60 seconds after sending before verifying</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════ TOAST CONTAINER ═══════ -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
