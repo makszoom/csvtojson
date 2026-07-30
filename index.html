@@ -129,9 +129,14 @@
         <!-- Preview Table (hidden until parsed) -->
         <div class="preview-section" id="previewSection" style="display:none;">
             <h3 class="section-title">Preview <span class="preview-count" id="previewCount"></span></h3>
-            <p class="preview-hint">Set column types for precise JSON output:</p>
+            <p class="preview-hint">Set column types and JSON paths (dot-notation) for precise nested JSON output:</p>
             <div class="table-wrapper">
                 <table class="preview-table" id="previewTable"></table>
+            </div>
+            <div class="mapping-controls">
+                <button class="btn-secondary btn-mapping" id="resetPathsBtn">Reset Paths</button>
+                <button class="btn-secondary btn-mapping" id="saveMappingBtn">Save Mapping</button>
+                <button class="btn-secondary btn-mapping" id="loadMappingBtn">Load Mapping</button>
             </div>
         </div>
 
