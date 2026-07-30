@@ -32,6 +32,8 @@ const els = {
     headerRow:      document.getElementById('headerRow'),
     typeDetection:  document.getElementById('typeDetection'),
     nestedMapping:  document.getElementById('nestedMapping'),
+    quoteHandling:  document.getElementById('quoteHandling'),
+    skipEmpty:      document.getElementById('skipEmpty'),
     // Paywall
     paywallModal:   document.getElementById('paywallModal'),
     paywallClose:   document.getElementById('paywallClose'),
@@ -45,6 +47,9 @@ let conversionsUsed = parseInt(localStorage.getItem('csvtojson_used') || '0');
 const MAX_FREE = 5;
 const STORAGE_KEY_USED = 'csvtojson_used';
 const STORAGE_KEY_UNLOCKED = 'csvtojson_unlocked';
+
+// Column types: { columnName: 'auto' | 'string' | 'number' | 'boolean' | 'null' }
+let columnTypes = {};
 
 // ─── Helpers ───
 function isUnlocked() {
@@ -188,6 +193,8 @@ function getWorker() {
 function parseForPreview(fileObj) {
     const delimiter = els.delimiter.value;
     const header = els.headerRow.value === 'true';
+    const quoteHandling = els.quoteHandling.value === 'true';
+    const skipEmpty = els.skipEmpty.value === 'true';
 
     if (fileObj.size > WORKER_THRESHOLD) {
         // Use Worker for large files
@@ -196,7 +203,9 @@ function parseForPreview(fileObj) {
         const config = {
             delimiter: delimiter === 'auto' ? '' : delimiter,
             header: header,
-            dynamicTyping: false
+            dynamicTyping: false,
+            quotes: quoteHandling,
+            skipEmptyLines: skipEmpty
         };
 
         worker.onmessage = function(e) {
@@ -222,7 +231,8 @@ function parseForPreview(fileObj) {
             delimiter: delimiter === 'auto' ? '' : delimiter,
             header: header,
             preview: 6,
-            skipEmptyLines: true,
+            skipEmptyLines: skipEmpty,
+            quotes: quoteHandling,
             complete: (results) => {
                 fileObj.parsed = results;
                 renderPreview(results, header);
@@ -247,11 +257,30 @@ function renderPreview(results, hasHeader) {
     const rows = results.data;
     let html = '';
 
+    // Type options for dropdown
+    const typeOptions = ['auto', 'string', 'number', 'boolean', 'null'];
+
     if (hasHeader && rows[0] && typeof rows[0] === 'object' && !Array.isArray(rows[0])) {
         // Object mode (header = keys)
         const keys = Object.keys(rows[0]);
+
+        // Reset column types for new file
+        if (Object.keys(columnTypes).length === 0 || !keys.every(k => k in columnTypes)) {
+            columnTypes = {};
+            keys.forEach(k => { columnTypes[k] = 'auto'; });
+        }
+
         html += '<thead><tr>';
-        keys.forEach(k => { html += `<th>${escapeHtml(k)}</th>`; });
+        keys.forEach(k => {
+            const selected = columnTypes[k] || 'auto';
+            const opts = typeOptions.map(t =>
+                `<option value="${t}" ${t === selected ? 'selected' : ''}>${t}</option>`
+            ).join('');
+            html += `<th>
+                <span class="col-name">${escapeHtml(k)}</span>
+                <select class="col-type-select" data-col="${escapeHtml(k)}">${opts}</select>
+            </th>`;
+        });
         html += '</tr></thead><tbody>';
         rows.forEach(row => {
             html += '<tr>';
@@ -260,20 +289,13 @@ function renderPreview(results, hasHeader) {
         });
         html += '</tbody>';
     } else {
-        // Array mode
+        // Array mode — no type dropdowns (no column names)
         const maxCols = Math.max(...rows.map(r => Array.isArray(r) ? r.length : 1));
         html += '<tbody>';
-        rows.forEach((row, i) => {
+        rows.forEach(row => {
             html += '<tr>';
-            if (i === 0 && !hasHeader) {
-                // No header — just show data
-                for (let c = 0; c < maxCols; c++) {
-                    html += `<td>${escapeHtml(String(row[c] ?? ''))}</td>`;
-                }
-            } else {
-                for (let c = 0; c < maxCols; c++) {
-                    html += `<td>${escapeHtml(String(row[c] ?? ''))}</td>`;
-                }
+            for (let c = 0; c < maxCols; c++) {
+                html += `<td>${escapeHtml(String(row[c] ?? ''))}</td>`;
             }
             html += '</tr>';
         });
@@ -283,11 +305,22 @@ function renderPreview(results, hasHeader) {
     els.previewTable.innerHTML = html;
     const totalRows = rows.length;
     els.previewCount.textContent = `(${totalRows} row${totalRows !== 1 ? 's' : ''} shown)`;
+
+    // Wire up type dropdowns
+    els.previewTable.querySelectorAll('.col-type-select').forEach(sel => {
+        sel.addEventListener('change', (e) => {
+            columnTypes[e.target.dataset.col] = e.target.value;
+        });
+    });
 }
 
 // ─── Settings change → re-parse preview ───
-['delimiter', 'headerRow'].forEach(id => {
+['delimiter', 'headerRow', 'quoteHandling', 'skipEmpty'].forEach(id => {
     document.getElementById(id).addEventListener('change', () => {
+        // Reset column types when header or delimiter changes
+        if (id === 'headerRow' || id === 'delimiter') {
+            columnTypes = {};
+        }
         if (files.length > 0) parseForPreview(files[0]);
     });
 });
@@ -311,6 +344,8 @@ function convertToJSON() {
     const header = els.headerRow.value === 'true';
     const typeDetection = els.typeDetection.value === 'true';
     const useNested = els.nestedMapping.value === 'true';
+    const quoteHandling = els.quoteHandling.value === 'true';
+    const skipEmpty = els.skipEmpty.value === 'true';
 
     const fileObj = files[0];
     const useWorker = fileObj.size > WORKER_THRESHOLD;
@@ -326,7 +361,9 @@ function convertToJSON() {
     const config = {
         delimiter: delimiter === 'auto' ? '' : delimiter,
         header: header,
-        dynamicTyping: typeDetection
+        dynamicTyping: typeDetection,
+        quotes: quoteHandling,
+        skipEmptyLines: skipEmpty
     };
 
     if (useWorker) {
@@ -362,8 +399,9 @@ function convertToJSON() {
         Papa.parse(fileObj.file, {
             delimiter: config.delimiter,
             header: header,
-            skipEmptyLines: true,
+            skipEmptyLines: skipEmpty,
             dynamicTyping: typeDetection,
+            quotes: quoteHandling,
             complete: (results) => {
                 processResult(results.data, results.meta, header, useNested);
                 els.convertBtn.disabled = false;
@@ -378,6 +416,19 @@ function convertToJSON() {
 
 function processResult(data, meta, header, useNested) {
     let json = data;
+
+    // Apply manual column types if any are set (not 'auto')
+    const hasManualTypes = header && Object.values(columnTypes).some(t => t !== 'auto');
+    if (hasManualTypes && header) {
+        json = json.map(row => {
+            const result = {};
+            for (const [key, value] of Object.entries(row)) {
+                const type = columnTypes[key] || 'auto';
+                result[key] = castValue(value, type);
+            }
+            return result;
+        });
+    }
 
     // Apply nested mapping if enabled
     if (useNested && header) {
@@ -404,6 +455,31 @@ function processResult(data, meta, header, useNested) {
     }
 
     showToast(`Converted ${json.length} rows!`, 'success');
+}
+
+// ─── Value type casting ───
+function castValue(value, type) {
+    if (value === null || value === undefined || value === '') {
+        if (type === 'null') return null;
+        return value;
+    }
+
+    switch (type) {
+        case 'string':
+            return String(value);
+        case 'number':
+            const num = Number(value);
+            return isNaN(num) ? value : num;
+        case 'boolean':
+            if (value === true || value === 'true' || value === '1' || value === 'yes') return true;
+            if (value === false || value === 'false' || value === '0' || value === 'no') return false;
+            return value;
+        case 'null':
+            return null;
+        case 'auto':
+        default:
+            return value; // PapaParse dynamicTyping already handled it
+    }
 }
 
 // ─── Nested Mapping (dot-notation → nested objects) ───
