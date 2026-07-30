@@ -51,6 +51,9 @@ const STORAGE_KEY_UNLOCKED = 'csvtojson_unlocked';
 // Column types: { columnName: 'auto' | 'string' | 'number' | 'boolean' | 'null' }
 let columnTypes = {};
 
+// JSON paths: { columnName: 'dot.notation.path' } — for nested mapping
+let jsonPaths = {};
+
 // ─── Helpers ───
 function isUnlocked() {
     return localStorage.getItem(STORAGE_KEY_UNLOCKED) === 'true';
@@ -270,15 +273,30 @@ function renderPreview(results, hasHeader) {
             keys.forEach(k => { columnTypes[k] = 'auto'; });
         }
 
+        // Reset JSON paths for new file
+        if (Object.keys(jsonPaths).length === 0 || !keys.every(k => k in jsonPaths)) {
+            jsonPaths = {};
+            keys.forEach(k => {
+                // Auto-detect: if column contains dot → pre-fill with column name
+                jsonPaths[k] = k.includes('.') ? k : k;
+            });
+        }
+
         html += '<thead><tr>';
         keys.forEach(k => {
             const selected = columnTypes[k] || 'auto';
             const opts = typeOptions.map(t =>
                 `<option value="${t}" ${t === selected ? 'selected' : ''}>${t}</option>`
             ).join('');
+            const pathValue = jsonPaths[k] || k;
+            const hasDot = k.includes('.');
             html += `<th>
                 <span class="col-name">${escapeHtml(k)}</span>
                 <select class="col-type-select" data-col="${escapeHtml(k)}">${opts}</select>
+                <input type="text" class="json-path-input" data-col="${escapeHtml(k)}"
+                    value="${escapeHtml(pathValue)}"
+                    placeholder="${escapeHtml(k)}"
+                    title="JSON path (dot-notation, e.g. address.city)">
             </th>`;
         });
         html += '</tr></thead><tbody>';
@@ -312,14 +330,22 @@ function renderPreview(results, hasHeader) {
             columnTypes[e.target.dataset.col] = e.target.value;
         });
     });
+
+    // Wire up JSON path inputs
+    els.previewTable.querySelectorAll('.json-path-input').forEach(inp => {
+        inp.addEventListener('input', (e) => {
+            jsonPaths[e.target.dataset.col] = e.target.value;
+        });
+    });
 }
 
 // ─── Settings change → re-parse preview ───
 ['delimiter', 'headerRow', 'quoteHandling', 'skipEmpty'].forEach(id => {
     document.getElementById(id).addEventListener('change', () => {
-        // Reset column types when header or delimiter changes
+        // Reset column types and JSON paths when header or delimiter changes
         if (id === 'headerRow' || id === 'delimiter') {
             columnTypes = {};
+            jsonPaths = {};
         }
         if (files.length > 0) parseForPreview(files[0]);
     });
@@ -430,9 +456,11 @@ function processResult(data, meta, header, useNested) {
         });
     }
 
-    // Apply nested mapping if enabled
-    if (useNested && header) {
-        json = json.map(row => applyNestedMapping(row));
+    // Apply nested mapping: use JSON paths from inputs
+    // Always apply if any path differs from the column name (contains a dot)
+    const hasNestedPaths = header && Object.entries(jsonPaths).some(([k, v]) => v && v.includes('.'));
+    if (hasNestedPaths && header) {
+        json = json.map(row => applyJsonPaths(row));
     }
 
     const jsonStr = JSON.stringify(json, null, 2);
@@ -482,14 +510,21 @@ function castValue(value, type) {
     }
 }
 
-// ─── Nested Mapping (dot-notation → nested objects) ───
-function applyNestedMapping(row) {
+// ─── Nested Mapping (JSON paths → nested objects) ───
+// Uses jsonPaths: { originalColumnName: 'dot.notation.path' }
+// If path == column name → flat key (no change)
+// If path contains dots → nested object (e.g. 'address.city' → { address: { city: ... } })
+// If path has numeric parts → array (e.g. 'items.0.title' → { items: [{ title: ... }] })
+function applyJsonPaths(row) {
     const result = {};
-    for (const [key, value] of Object.entries(row)) {
-        if (key.includes('.')) {
-            setNestedPath(result, key, value);
+    for (const [colName, value] of Object.entries(row)) {
+        const path = jsonPaths[colName] || colName;
+        if (path === colName || !path.includes('.')) {
+            // Flat key — same as column name or no dots
+            result[path] = value;
         } else {
-            result[key] = value;
+            // Nested path with dots
+            setNestedPath(result, path, value);
         }
     }
     return result;
@@ -503,9 +538,23 @@ function setNestedPath(obj, path, value) {
         // Array index detection: items.0.title → items[0].title
         if (/^\d+$/.test(part)) {
             const idx = parseInt(part);
-            if (!Array.isArray(current)) current = [];
-            if (!current[idx]) current[idx] = {};
-            current = current[idx];
+            if (!Array.isArray(current[parts[i-1]] || current)) {
+                // Determine parent key
+                if (i === 0) {
+                    if (!Array.isArray(current)) current = [];
+                }
+            }
+            // Navigate: ensure array exists
+            if (i > 0) {
+                const parentKey = parts[i-1];
+                if (!current[parentKey]) current[parentKey] = [];
+                if (!current[parentKey][idx]) current[parentKey][idx] = {};
+                current = current[parentKey][idx];
+            } else {
+                if (!Array.isArray(current)) current = [];
+                if (!current[idx]) current[idx] = {};
+                current = current[idx];
+            }
         } else {
             if (!(part in current)) current[part] = {};
             current = current[part];
@@ -518,6 +567,59 @@ function setNestedPath(obj, path, value) {
         current[idx] = value;
     } else {
         current[lastPart] = value;
+    }
+}
+
+// ─── Nested mapping controls ───
+function resetJsonPaths() {
+    if (files.length === 0 || !files[0].parsed) return;
+    const keys = Object.keys(files[0].parsed.data[0] || {});
+    jsonPaths = {};
+    keys.forEach(k => { jsonPaths[k] = k; });
+    // Re-render preview to update inputs
+    if (files[0].parsed) {
+        const previewData = files[0].parsed.data.slice(0, 6);
+        renderPreview({ data: previewData, meta: files[0].parsed.meta }, els.headerRow.value === 'true');
+    }
+    showToast('JSON paths reset', 'success');
+}
+
+function autoDetectNested() {
+    if (files.length === 0 || !files[0].parsed) return;
+    const keys = Object.keys(files[0].parsed.data[0] || {});
+    jsonPaths = {};
+    keys.forEach(k => {
+        // Auto-detect: if column contains dot → use it as nested path
+        jsonPaths[k] = k;
+    });
+    // Re-render
+    if (files[0].parsed) {
+        const previewData = files[0].parsed.data.slice(0, 6);
+        renderPreview({ data: previewData, meta: files[0].parsed.meta }, els.headerRow.value === 'true');
+    }
+    showToast('Auto-detected nested paths', 'success');
+}
+
+function saveMapping() {
+    if (files.length === 0) return;
+    const mappingName = files[0].name.replace(/\.[^.]+$/, '');
+    localStorage.setItem('csvtojson_mapping_' + mappingName, JSON.stringify(jsonPaths));
+    showToast('Mapping saved for "' + mappingName + '"', 'success');
+}
+
+function loadMapping() {
+    if (files.length === 0) return;
+    const mappingName = files[0].name.replace(/\.[^.]+$/, '');
+    const saved = localStorage.getItem('csvtojson_mapping_' + mappingName);
+    if (saved) {
+        jsonPaths = JSON.parse(saved);
+        if (files[0].parsed) {
+            const previewData = files[0].parsed.data.slice(0, 6);
+            renderPreview({ data: previewData, meta: files[0].parsed.meta }, els.headerRow.value === 'true');
+        }
+        showToast('Mapping loaded', 'success');
+    } else {
+        showToast('No saved mapping for this file', 'error');
     }
 }
 
@@ -595,3 +697,8 @@ els.paywallModal.addEventListener('click', (e) => {
 
 // ─── Init ───
 updateCounter();
+
+// ─── Mapping control buttons ───
+document.getElementById('resetPathsBtn').addEventListener('click', resetJsonPaths);
+document.getElementById('saveMappingBtn').addEventListener('click', saveMapping);
+document.getElementById('loadMappingBtn').addEventListener('click', loadMapping);
