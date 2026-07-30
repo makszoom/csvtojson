@@ -23,6 +23,10 @@ const els = {
     jsonOutput:     document.getElementById('jsonOutput'),
     copyBtn:        document.getElementById('copyBtn'),
     downloadBtn:    document.getElementById('downloadBtn'),
+    // Progress
+    progressSection:document.getElementById('progressSection'),
+    progressFill:   document.getElementById('progressFill'),
+    progressText:   document.getElementById('progressText'),
     // Settings
     delimiter:      document.getElementById('delimiter'),
     headerRow:      document.getElementById('headerRow'),
@@ -170,25 +174,66 @@ els.clearAllBtn.addEventListener('click', () => {
 });
 
 // ─── CSV Preview (first file, first 5 rows) ───
+// Uses Worker for files >1MB, PapaParse directly for small files
+const WORKER_THRESHOLD = 1024 * 1024; // 1MB
+let csvWorker = null;
+
+function getWorker() {
+    if (!csvWorker) {
+        csvWorker = new Worker('js/csv-worker.js');
+    }
+    return csvWorker;
+}
+
 function parseForPreview(fileObj) {
     const delimiter = els.delimiter.value;
     const header = els.headerRow.value === 'true';
 
-    Papa.parse(fileObj.file, {
-        delimiter: delimiter === 'auto' ? '' : delimiter,
-        header: header,
-        preview: 6, // header + 5 rows
-        skipEmptyLines: true,
-        complete: (results) => {
-            fileObj.parsed = results;
-            renderPreview(results, header);
-            els.settingsPanel.style.display = 'block';
-            els.convertAction.style.display = 'flex';
-        },
-        error: (err) => {
-            showToast('Parse error: ' + err.message, 'error');
-        }
-    });
+    if (fileObj.size > WORKER_THRESHOLD) {
+        // Use Worker for large files
+        const worker = getWorker();
+        const jobId = 'preview-' + Date.now();
+        const config = {
+            delimiter: delimiter === 'auto' ? '' : delimiter,
+            header: header,
+            dynamicTyping: false
+        };
+
+        worker.onmessage = function(e) {
+            if (e.data.jobId !== jobId) return;
+
+            if (e.data.type === 'complete') {
+                const results = { data: e.data.data, meta: e.data.meta, errors: e.data.errors };
+                fileObj.parsed = results;
+                // Show only first 6 rows for preview
+                const previewData = results.data.slice(0, 6);
+                renderPreview({ data: previewData, meta: results.meta }, header);
+                els.settingsPanel.style.display = 'block';
+                els.convertAction.style.display = 'flex';
+            } else if (e.data.type === 'error') {
+                showToast('Parse error: ' + e.data.message, 'error');
+            }
+        };
+
+        worker.postMessage({ file: fileObj.file, config, jobId });
+    } else {
+        // Small file — parse directly
+        Papa.parse(fileObj.file, {
+            delimiter: delimiter === 'auto' ? '' : delimiter,
+            header: header,
+            preview: 6,
+            skipEmptyLines: true,
+            complete: (results) => {
+                fileObj.parsed = results;
+                renderPreview(results, header);
+                els.settingsPanel.style.display = 'block';
+                els.convertAction.style.display = 'flex';
+            },
+            error: (err) => {
+                showToast('Parse error: ' + err.message, 'error');
+            }
+        });
+    }
 }
 
 function renderPreview(results, hasHeader) {
@@ -268,40 +313,97 @@ function convertToJSON() {
     const useNested = els.nestedMapping.value === 'true';
 
     const fileObj = files[0];
+    const useWorker = fileObj.size > WORKER_THRESHOLD;
 
-    Papa.parse(fileObj.file, {
+    // Show progress
+    if (useWorker) {
+        els.progressSection.style.display = 'flex';
+        els.progressFill.style.width = '0%';
+        els.progressText.textContent = 'Parsing...';
+    }
+    els.convertBtn.disabled = true;
+
+    const config = {
         delimiter: delimiter === 'auto' ? '' : delimiter,
         header: header,
-        skipEmptyLines: true,
-        dynamicTyping: typeDetection,
-        complete: (results) => {
-            let json = results.data;
+        dynamicTyping: typeDetection
+    };
 
-            // Apply nested mapping if enabled
-            if (useNested && header) {
-                json = json.map(row => applyNestedMapping(row));
+    if (useWorker) {
+        const worker = getWorker();
+        const jobId = 'convert-' + Date.now();
+
+        worker.onmessage = function(e) {
+            if (e.data.jobId !== jobId) return;
+
+            if (e.data.type === 'start') {
+                els.progressText.textContent = 'Parsing CSV...';
+            } else if (e.data.type === 'progress') {
+                const pct = Math.round((e.data.bytesProcessed / e.data.totalBytes) * 100);
+                els.progressFill.style.width = pct + '%';
+                els.progressText.textContent = pct + '%';
+            } else if (e.data.type === 'complete') {
+                els.progressFill.style.width = '100%';
+                els.progressText.textContent = 'Done!';
+                setTimeout(() => { els.progressSection.style.display = 'none'; }, 500);
+
+                processResult(e.data.data, e.data.meta, header, useNested);
+                els.convertBtn.disabled = false;
+            } else if (e.data.type === 'error') {
+                showToast('Conversion error: ' + e.data.message, 'error');
+                els.progressSection.style.display = 'none';
+                els.convertBtn.disabled = false;
             }
+        };
 
-            const jsonStr = JSON.stringify(json, null, 2);
-            els.jsonOutput.textContent = jsonStr;
-            if (window.hljs) {
-                hljs.highlightElement(els.jsonOutput);
+        worker.postMessage({ file: fileObj.file, config, jobId });
+    } else {
+        // Small file — parse directly
+        Papa.parse(fileObj.file, {
+            delimiter: config.delimiter,
+            header: header,
+            skipEmptyLines: true,
+            dynamicTyping: typeDetection,
+            complete: (results) => {
+                processResult(results.data, results.meta, header, useNested);
+                els.convertBtn.disabled = false;
+            },
+            error: (err) => {
+                showToast('Conversion error: ' + err.message, 'error');
+                els.convertBtn.disabled = false;
             }
-            els.outputSection.style.display = 'block';
+        });
+    }
+}
 
-            // Increment counter
-            if (!isUnlocked()) {
-                conversionsUsed++;
-                localStorage.setItem(STORAGE_KEY_USED, conversionsUsed.toString());
-                updateCounter();
-            }
+function processResult(data, meta, header, useNested) {
+    let json = data;
 
-            showToast('Converted successfully!', 'success');
-        },
-        error: (err) => {
-            showToast('Conversion error: ' + err.message, 'error');
-        }
-    });
+    // Apply nested mapping if enabled
+    if (useNested && header) {
+        json = json.map(row => applyNestedMapping(row));
+    }
+
+    const jsonStr = JSON.stringify(json, null, 2);
+    els.jsonOutput.textContent = jsonStr;
+
+    // highlight.js syntax highlighting
+    if (window.hljs) {
+        els.jsonOutput.removeAttribute('data-highlighted');
+        els.jsonOutput.className = 'language-json';
+        hljs.highlightElement(els.jsonOutput);
+    }
+
+    els.outputSection.style.display = 'block';
+
+    // Increment counter
+    if (!isUnlocked()) {
+        conversionsUsed++;
+        localStorage.setItem(STORAGE_KEY_USED, conversionsUsed.toString());
+        updateCounter();
+    }
+
+    showToast(`Converted ${json.length} rows!`, 'success');
 }
 
 // ─── Nested Mapping (dot-notation → nested objects) ───
