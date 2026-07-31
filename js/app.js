@@ -27,6 +27,10 @@ const els = {
     progressSection:document.getElementById('progressSection'),
     progressFill:   document.getElementById('progressFill'),
     progressText:   document.getElementById('progressText'),
+    // Batch
+    batchControls:  document.getElementById('batchControls'),
+    batchMode:      document.getElementById('batchMode'),
+    downloadZipBtn: document.getElementById('downloadZipBtn'),
     // Settings
     delimiter:      document.getElementById('delimiter'),
     headerRow:      document.getElementById('headerRow'),
@@ -145,6 +149,13 @@ function renderFileList() {
     els.fileListSection.style.display = 'block';
     els.fileCount.textContent = files.length;
 
+    // Show batch controls if >1 file
+    if (files.length > 1) {
+        els.batchControls.style.display = 'block';
+    } else {
+        els.batchControls.style.display = 'none';
+    }
+
     els.fileList.innerHTML = files.map((f, i) => `
         <div class="file-item">
             <span class="file-item-icon">📄</span>
@@ -174,11 +185,15 @@ function renderFileList() {
 // ─── Clear All ───
 els.clearAllBtn.addEventListener('click', () => {
     files = [];
+    batchResults = [];
     renderFileList();
     els.previewSection.style.display = 'none';
     els.settingsPanel.style.display = 'none';
     els.convertAction.style.display = 'none';
     els.outputSection.style.display = 'none';
+    els.batchControls.style.display = 'none';
+    els.downloadZipBtn.style.display = 'none';
+    els.downloadBtn.style.display = 'inline-block';
 });
 
 // ─── CSV Preview (first file, first 5 rows) ───
@@ -351,7 +366,7 @@ function renderPreview(results, hasHeader) {
     });
 });
 
-// ─── Convert Button (Day 2+ — full implementation) ───
+// ─── Convert Button ───
 els.convertBtn.addEventListener('click', () => {
     if (!isUnlocked() && conversionsUsed >= MAX_FREE) {
         showPaywall();
@@ -359,6 +374,11 @@ els.convertBtn.addEventListener('click', () => {
     }
     convertToJSON();
 });
+
+function getBatchOutputMode() {
+    const checked = document.querySelector('input[name="batchOutput"]:checked');
+    return checked ? checked.value : 'zip';
+}
 
 function convertToJSON() {
     if (files.length === 0) {
@@ -373,17 +393,19 @@ function convertToJSON() {
     const quoteHandling = els.quoteHandling.value === 'true';
     const skipEmpty = els.skipEmpty.value === 'true';
 
-    const fileObj = files[0];
-    const useWorker = fileObj.size > WORKER_THRESHOLD;
+    // Check batch mode
+    const isBatch = files.length > 1 && els.batchMode && els.batchMode.checked;
 
-    // Show progress
-    if (useWorker) {
-        els.progressSection.style.display = 'flex';
-        els.progressFill.style.width = '0%';
-        els.progressText.textContent = 'Parsing...';
+    if (isBatch) {
+        convertBatch(delimiter, header, typeDetection, useNested, quoteHandling, skipEmpty);
+    } else {
+        convertSingle(files[0], delimiter, header, typeDetection, useNested, quoteHandling, skipEmpty);
     }
-    els.convertBtn.disabled = true;
+}
 
+// ─── Single file conversion ───
+function convertSingle(fileObj, delimiter, header, typeDetection, useNested, quoteHandling, skipEmpty) {
+    const useWorker = fileObj.size > WORKER_THRESHOLD;
     const config = {
         delimiter: delimiter === 'auto' ? '' : delimiter,
         header: header,
@@ -391,6 +413,13 @@ function convertToJSON() {
         quotes: quoteHandling,
         skipEmptyLines: skipEmpty
     };
+
+    if (useWorker) {
+        els.progressSection.style.display = 'flex';
+        els.progressFill.style.width = '0%';
+        els.progressText.textContent = 'Parsing...';
+    }
+    els.convertBtn.disabled = true;
 
     if (useWorker) {
         const worker = getWorker();
@@ -409,7 +438,6 @@ function convertToJSON() {
                 els.progressFill.style.width = '100%';
                 els.progressText.textContent = 'Done!';
                 setTimeout(() => { els.progressSection.style.display = 'none'; }, 500);
-
                 processResult(e.data.data, e.data.meta, header, useNested);
                 els.convertBtn.disabled = false;
             } else if (e.data.type === 'error') {
@@ -421,7 +449,6 @@ function convertToJSON() {
 
         worker.postMessage({ file: fileObj.file, config, jobId });
     } else {
-        // Small file — parse directly
         Papa.parse(fileObj.file, {
             delimiter: config.delimiter,
             header: header,
@@ -438,6 +465,157 @@ function convertToJSON() {
             }
         });
     }
+}
+
+// ─── Batch conversion (multiple files) ───
+let batchResults = []; // Store results from batch
+
+function convertBatch(delimiter, header, typeDetection, useNested, quoteHandling, skipEmpty) {
+    batchResults = [];
+    els.convertBtn.disabled = true;
+    els.progressSection.style.display = 'flex';
+    els.progressFill.style.width = '0%';
+    els.progressText.textContent = `Converting 1 of ${files.length}...`;
+
+    const config = {
+        delimiter: delimiter === 'auto' ? '' : delimiter,
+        header: header,
+        dynamicTyping: typeDetection,
+        quotes: quoteHandling,
+        skipEmptyLines: skipEmpty
+    };
+
+    let completed = 0;
+
+    files.forEach((fileObj, idx) => {
+        const useWorker = fileObj.size > WORKER_THRESHOLD;
+
+        if (useWorker) {
+            const worker = getWorker();
+            const jobId = 'batch-' + idx + '-' + Date.now();
+
+            worker.onmessage = function(e) {
+                if (e.data.jobId !== jobId) return;
+
+                if (e.data.type === 'complete') {
+                    const processed = processResultSilent(e.data.data, header, useNested);
+                    batchResults.push({
+                        name: fileObj.name.replace(/\.[^.]+$/, '') + '.json',
+                        data: processed
+                    });
+                    completed++;
+                    updateBatchProgress(completed, files.length);
+                } else if (e.data.type === 'error') {
+                    showToast(`Error: ${fileObj.name}`, 'error');
+                    completed++;
+                    updateBatchProgress(completed, files.length);
+                }
+            };
+
+            worker.postMessage({ file: fileObj.file, config, jobId });
+        } else {
+            Papa.parse(fileObj.file, {
+                delimiter: config.delimiter,
+                header: header,
+                skipEmptyLines: skipEmpty,
+                dynamicTyping: typeDetection,
+                quotes: quoteHandling,
+                complete: (results) => {
+                    const processed = processResultSilent(results.data, header, useNested);
+                    batchResults.push({
+                        name: fileObj.name.replace(/\.[^.]+$/, '') + '.json',
+                        data: processed
+                    });
+                    completed++;
+                    updateBatchProgress(completed, files.length);
+                },
+                error: (err) => {
+                    showToast(`Error: ${fileObj.name}`, 'error');
+                    completed++;
+                    updateBatchProgress(completed, files.length);
+                }
+            });
+        }
+    });
+}
+
+function updateBatchProgress(completed, total) {
+    const pct = Math.round((completed / total) * 100);
+    els.progressFill.style.width = pct + '%';
+    els.progressText.textContent = `Converting ${completed} of ${total}...`;
+
+    if (completed >= total) {
+        els.progressFill.style.width = '100%';
+        els.progressText.textContent = 'Done!';
+        els.convertBtn.disabled = false;
+
+        const outputMode = getBatchOutputMode();
+
+        if (outputMode === 'merge') {
+            // Merge all results into one JSON array
+            const merged = batchResults.flatMap(r => r.data);
+            const jsonStr = JSON.stringify(merged, null, 2);
+            els.jsonOutput.textContent = jsonStr;
+            if (window.hljs) {
+                els.jsonOutput.removeAttribute('data-highlighted');
+                els.jsonOutput.className = 'language-json';
+                hljs.highlightElement(els.jsonOutput);
+            }
+            els.outputSection.style.display = 'block';
+            els.downloadZipBtn.style.display = 'none';
+            els.downloadBtn.style.display = 'inline-block';
+            showToast(`Merged ${batchResults.length} files → ${merged.length} rows!`, 'success');
+        } else {
+            // ZIP mode — show first file preview, enable ZIP download
+            const firstResult = batchResults[0];
+            if (firstResult) {
+                const jsonStr = JSON.stringify(firstResult.data, null, 2);
+                els.jsonOutput.textContent = jsonStr;
+                if (window.hljs) {
+                    els.jsonOutput.removeAttribute('data-highlighted');
+                    els.jsonOutput.className = 'language-json';
+                    hljs.highlightElement(els.jsonOutput);
+                }
+            }
+            els.outputSection.style.display = 'block';
+            els.downloadZipBtn.style.display = 'inline-block';
+            els.downloadBtn.style.display = 'none';
+            showToast(`Converted ${batchResults.length} files! Click Download .zip`, 'success');
+        }
+
+        // Increment counter
+        if (!isUnlocked()) {
+            conversionsUsed++;
+            localStorage.setItem(STORAGE_KEY_USED, conversionsUsed.toString());
+            updateCounter();
+        }
+
+        setTimeout(() => { els.progressSection.style.display = 'none'; }, 1000);
+    }
+}
+
+// Process result without showing output (for batch)
+function processResultSilent(data, header, useNested) {
+    let json = data;
+
+    const hasManualTypes = header && Object.values(columnTypes).some(t => t !== 'auto');
+    if (hasManualTypes && header) {
+        json = json.map(row => {
+            const result = {};
+            for (const [key, value] of Object.entries(row)) {
+                const type = columnTypes[key] || 'auto';
+                result[key] = castValue(value, type);
+            }
+            return result;
+        });
+    }
+
+    const hasNestedPaths = header && Object.entries(jsonPaths).some(([k, v]) => v && v.includes('.'));
+    if (hasNestedPaths && header) {
+        json = json.map(row => applyJsonPaths(row));
+    }
+
+    return json;
 }
 
 function processResult(data, meta, header, useNested) {
@@ -692,6 +870,41 @@ els.paywallClose.addEventListener('click', () => {
 els.paywallModal.addEventListener('click', (e) => {
     if (e.target === els.paywallModal) {
         els.paywallModal.classList.remove('open');
+    }
+});
+
+// ─── Download ZIP (batch mode) ───
+els.downloadZipBtn.addEventListener('click', async () => {
+    if (batchResults.length === 0) {
+        showToast('No batch results to download', 'error');
+        return;
+    }
+
+    if (typeof JSZip === 'undefined') {
+        showToast('JSZip not loaded', 'error');
+        return;
+    }
+
+    showToast('Creating ZIP...', '');
+
+    const zip = new JSZip();
+
+    batchResults.forEach(result => {
+        const jsonStr = JSON.stringify(result.data, null, 2);
+        zip.file(result.name, jsonStr);
+    });
+
+    try {
+        const blob = await zip.generateAsync({ type: 'blob' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.download = 'csvtojson-batch.zip';
+        link.href = url;
+        link.click();
+        URL.revokeObjectURL(url);
+        showToast(`Downloaded ${batchResults.length} files as ZIP!`, 'success');
+    } catch (err) {
+        showToast('ZIP creation failed: ' + err.message, 'error');
     }
 });
 
