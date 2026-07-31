@@ -857,8 +857,33 @@ els.downloadBtn.addEventListener('click', () => {
     showToast('Downloaded!', 'success');
 });
 
-// ─── Paywall (placeholder — Day 6 full implementation) ───
+// ─── Paywall — Day 6 full implementation ───
+// Payment config — will be updated after Worker deployment
+const PAYMENT_CONFIG = {
+    WORKER_URL: 'https://csvtojson-payment.makszoom85.workers.dev',
+    TRC20_ADDRESS: '',  // Will be set after TronLink wallet creation
+    PRICE_USDT: 5,
+    QR_API: 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data='
+};
+
 function showPaywall() {
+    if (!PAYMENT_CONFIG.TRC20_ADDRESS) {
+        // Worker not deployed yet — show config message
+        showToast('Payment system is being configured. Please try again later.', 'error');
+        return;
+    }
+
+    // Populate payment UI
+    const addrInput = document.getElementById('paymentAddress');
+    if (addrInput) addrInput.value = PAYMENT_CONFIG.TRC20_ADDRESS;
+
+    // Generate QR code
+    const qrContainer = document.getElementById('paymentQR');
+    if (qrContainer) {
+        const qrData = PAYMENT_CONFIG.TRC20_ADDRESS;
+        qrContainer.innerHTML = `<img src="${PAYMENT_CONFIG.QR_API}${encodeURIComponent(qrData)}" alt="QR Code" width="200" height="200">`;
+    }
+
     els.paywallModal.classList.add('open');
 }
 
@@ -870,6 +895,91 @@ els.paywallClose.addEventListener('click', () => {
 els.paywallModal.addEventListener('click', (e) => {
     if (e.target === els.paywallModal) {
         els.paywallModal.classList.remove('open');
+    }
+});
+
+// ─── Copy address ───
+document.getElementById('copyAddressBtn').addEventListener('click', () => {
+    const addr = document.getElementById('paymentAddress');
+    if (!addr || !addr.value) return;
+
+    if (navigator.clipboard) {
+        navigator.clipboard.writeText(addr.value).then(() => {
+            const btn = document.getElementById('copyAddressBtn');
+            btn.textContent = '✓ Copied';
+            setTimeout(() => { btn.textContent = 'Copy'; }, 2000);
+            showToast('Address copied!', 'success');
+        }).catch(() => {
+            fallbackCopy(addr.value);
+            const btn = document.getElementById('copyAddressBtn');
+            btn.textContent = '✓ Copied';
+            setTimeout(() => { btn.textContent = 'Copy'; }, 2000);
+        });
+    } else {
+        fallbackCopy(addr.value);
+    }
+});
+
+// ─── Verify payment ───
+document.getElementById('verifyBtn').addEventListener('click', async () => {
+    const txidInput = document.getElementById('txidInput');
+    const statusEl = document.getElementById('paymentStatus');
+    const verifyBtn = document.getElementById('verifyBtn');
+
+    const txId = txidInput.value.trim();
+
+    if (!txId || !/^[a-fA-F0-9]{64}$/.test(txId)) {
+        statusEl.textContent = 'Invalid TXID. Expected 64 hex characters.';
+        statusEl.className = 'payment-status error';
+        return;
+    }
+
+    // Show loading
+    statusEl.textContent = 'Checking blockchain...';
+    statusEl.className = 'payment-status loading';
+    verifyBtn.disabled = true;
+
+    try {
+        const response = await fetch(PAYMENT_CONFIG.WORKER_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ txId })
+        });
+
+        const data = await response.json();
+
+        if (data.verified) {
+            statusEl.textContent = '✅ Payment verified! Unlocking...';
+            statusEl.className = 'payment-status success';
+
+            // Unlock
+            localStorage.setItem(STORAGE_KEY_UNLOCKED, 'true');
+            localStorage.removeItem(STORAGE_KEY_USED);
+            conversionsUsed = 0;
+            updateCounter();
+
+            // Close modal after delay
+            setTimeout(() => {
+                els.paywallModal.classList.remove('open');
+                showToast('Unlimited conversions activated! 🎉', 'success');
+            }, 1500);
+        } else {
+            statusEl.textContent = '❌ ' + (data.message || 'Verification failed');
+            statusEl.className = 'payment-status error';
+        }
+    } catch (err) {
+        statusEl.textContent = 'Network error. Try again.';
+        statusEl.className = 'payment-status error';
+    } finally {
+        verifyBtn.disabled = false;
+    }
+});
+
+// Enter key in TXID field → verify
+document.getElementById('txidInput').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        document.getElementById('verifyBtn').click();
     }
 });
 
