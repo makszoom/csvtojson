@@ -148,6 +148,18 @@
             <span class="counter" id="counter">Free conversions left: <strong>5</strong>/5</span>
         </div>
 
+        <!-- Batch mode controls (shown when multiple files) -->
+        <div class="batch-controls" id="batchControls" style="display:none;">
+            <label class="batch-toggle">
+                <input type="checkbox" id="batchMode" checked>
+                <span>Convert all files (batch)</span>
+            </label>
+            <div class="batch-output-mode" id="batchOutputMode">
+                <label><input type="radio" name="batchOutput" value="zip" checked> Download as ZIP</label>
+                <label><input type="radio" name="batchOutput" value="merge"> Merge into one JSON</label>
+            </div>
+        </div>
+
         <!-- Progress Bar (shown during conversion) -->
         <div class="progress-bar-section" id="progressSection" style="display:none;">
             <div class="progress-bar">
@@ -163,6 +175,7 @@
                 <div class="output-actions">
                     <button class="btn-secondary btn-copy" id="copyBtn">Copy</button>
                     <button class="btn-secondary btn-download" id="downloadBtn">Download .json</button>
+                    <button class="btn-secondary btn-download-zip" id="downloadZipBtn" style="display:none;">Download .zip</button>
                 </div>
             </div>
             <pre class="output-code"><code id="jsonOutput" class="language-json"></code></pre>
