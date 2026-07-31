@@ -861,7 +861,7 @@ els.downloadBtn.addEventListener('click', () => {
 // Payment config — will be updated after Worker deployment
 const PAYMENT_CONFIG = {
     WORKER_URL: 'https://csvtojson-payment.makszoom85.workers.dev',
-    TRC20_ADDRESS: '',  // Will be set after TronLink wallet creation
+    TRC20_ADDRESS: 'TBjiqgjrETzauwdmDYn2HU39VbEevBtf6o',
     PRICE_USDT: 5,
     QR_API: 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data='
 };
