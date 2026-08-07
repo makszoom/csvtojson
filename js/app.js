@@ -107,61 +107,13 @@ els.fileInput.addEventListener('change', (e) => {
 });
 
 // ─── File Handling ───
-function isExcelFile(file) {
-    return /\.(xlsx|xls)$/i.test(file.name);
-}
-
-// Parse an Excel (.xlsx/.xls) file into PapaParse-compatible {data, meta}
-// Uses SheetJS in the main thread (binary read). Returns array of objects when header,
-// array of arrays otherwise — same shape PapaParse produces.
-function parseXlsxFile(fileObj, opts, onComplete, onError) {
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        try {
-            const wb = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
-            const ws = wb.Sheets[wb.SheetNames[0]];
-            if (!ws) {
-                onError(new Error('No sheet found in workbook'));
-                return;
-            }
-            // Array of arrays, raw values, null for empty cells
-            const aoa = XLSX.utils.sheet_to_json(ws, { header: 1, raw: true, defval: null });
-            // Drop trailing empty rows
-            while (aoa.length && aoa[aoa.length - 1].every(v => v === null || v === '')) aoa.pop();
-
-            let data;
-            if (opts.header) {
-                const keys = (aoa[0] || []).map(k => k === null ? '' : String(k));
-                data = aoa.slice(1).map(row => {
-                    const obj = {};
-                    keys.forEach((k, i) => {
-                        if (k !== '') obj[k] = row[i] !== undefined ? row[i] : null;
-                    });
-                    return obj;
-                });
-            } else {
-                data = aoa;
-            }
-
-            onComplete({
-                data: data,
-                meta: { fields: opts.header ? (aoa[0] || []).map(k => k === null ? '' : String(k)) : [], delimiter: 'excel' }
-            });
-        } catch (err) {
-            onError(err);
-        }
-    };
-    reader.onerror = function() { onError(new Error('Failed to read file')); };
-    reader.readAsArrayBuffer(fileObj.file);
-}
-
 function handleFiles(fileList) {
     const csvFiles = Array.from(fileList).filter(f =>
-        f.name.endsWith('.csv') || f.name.endsWith('.txt') || f.name.endsWith('.tsv') || f.type === 'text/csv' || isExcelFile(f)
+        f.name.endsWith('.csv') || f.name.endsWith('.txt') || f.name.endsWith('.tsv') || f.type === 'text/csv'
     );
 
     if (csvFiles.length === 0) {
-        showToast('Please drop CSV or Excel files only', 'error');
+        showToast('Please drop CSV files only', 'error');
         return;
     }
 
@@ -261,20 +213,6 @@ function parseForPreview(fileObj) {
     const header = els.headerRow.value === 'true';
     const quoteHandling = els.quoteHandling.value === 'true';
     const skipEmpty = els.skipEmpty.value === 'true';
-
-    // Excel files: parse in main thread via SheetJS (Worker can't import binary easily)
-    if (isExcelFile(fileObj.file)) {
-        parseXlsxFile(fileObj, { header: header, skipEmptyLines: skipEmpty }, (results) => {
-            fileObj.parsed = results;
-            const previewData = results.data.slice(0, 6);
-            renderPreview({ data: previewData, meta: results.meta }, header);
-            els.settingsPanel.style.display = 'block';
-            els.convertAction.style.display = 'flex';
-        }, (err) => {
-            showToast('Excel parse error: ' + err.message, 'error');
-        });
-        return;
-    }
 
     if (fileObj.size > WORKER_THRESHOLD) {
         // Use Worker for large files
@@ -467,40 +405,6 @@ function convertToJSON() {
 
 // ─── Single file conversion ───
 function convertSingle(fileObj, delimiter, header, typeDetection, useNested, quoteHandling, skipEmpty) {
-    // Excel file — parse in main thread via SheetJS, then process result
-    if (isExcelFile(fileObj.file)) {
-        els.convertBtn.disabled = true;
-        parseXlsxFile(fileObj, { header: header, skipEmptyLines: skipEmpty }, (results) => {
-            // Apply dynamic typing if enabled (SheetJS raw values already have real types,
-            // but strings stay strings — match PapaParse dynamicTyping behaviour loosely)
-            let data = results.data;
-            if (typeDetection && header) {
-                data = data.map(row => {
-                    const out = {};
-                    for (const [k, v] of Object.entries(row)) {
-                        if (typeof v === 'string') {
-                            if (v.trim() === '') { out[k] = v; }
-                            else if (!isNaN(Number(v)) && v.trim() !== '') { out[k] = Number(v); }
-                            else if (v === 'true') { out[k] = true; }
-                            else if (v === 'false') { out[k] = false; }
-                            else if (v === 'null') { out[k] = null; }
-                            else { out[k] = v; }
-                        } else {
-                            out[k] = v;
-                        }
-                    }
-                    return out;
-                });
-            }
-            processResult(data, results.meta, header, useNested);
-            els.convertBtn.disabled = false;
-        }, (err) => {
-            showToast('Excel conversion error: ' + err.message, 'error');
-            els.convertBtn.disabled = false;
-        });
-        return;
-    }
-
     const useWorker = fileObj.size > WORKER_THRESHOLD;
     const config = {
         delimiter: delimiter === 'auto' ? '' : delimiter,
@@ -585,24 +489,6 @@ function convertBatch(delimiter, header, typeDetection, useNested, quoteHandling
 
     files.forEach((fileObj, idx) => {
         const useWorker = fileObj.size > WORKER_THRESHOLD;
-
-        // Excel file — parse in main thread via SheetJS
-        if (isExcelFile(fileObj.file)) {
-            parseXlsxFile(fileObj, { header: header, skipEmptyLines: skipEmpty }, (results) => {
-                const processed = processResultSilent(results.data, header, useNested);
-                batchResults.push({
-                    name: fileObj.name.replace(/\.[^.]+$/, '') + '.json',
-                    data: processed
-                });
-                completed++;
-                updateBatchProgress(completed, files.length);
-            }, (err) => {
-                showToast(`Error: ${fileObj.name}`, 'error');
-                completed++;
-                updateBatchProgress(completed, files.length);
-            });
-            return;
-        }
 
         if (useWorker) {
             const worker = getWorker();
