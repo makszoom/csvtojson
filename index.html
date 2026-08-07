@@ -21,8 +21,6 @@
 
     <!-- PapaParse CDN -->
     <script src="https://unpkg.com/papaparse@5.4.1/papaparse.min.js"></script>
-    <!-- SheetJS (xlsx) CDN — Excel support -->
-    <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
     <!-- JSZip CDN -->
     <script src="https://unpkg.com/jszip@3.10.1/dist/jszip.min.js"></script>
     <!-- highlight.js CDN (JSON only) -->
@@ -60,11 +58,11 @@
     <main class="container">
         <!-- Drop Zone -->
         <div class="drop-zone" id="dropZone">
-            <input type="file" id="fileInput" accept=".csv,.txt,.tsv,.xlsx,.xls" multiple hidden>
+            <input type="file" id="fileInput" accept=".csv,.txt,.tsv" multiple hidden>
             <div class="drop-zone-content">
                 <div class="drop-zone-icon">📄</div>
-                <p class="drop-zone-text">Drop CSV or Excel file here</p>
-                <p class="drop-zone-subtext">or click to browse · supports CSV, XLSX, TSV · multiple files for batch</p>
+                <p class="drop-zone-text">Drop CSV file here</p>
+                <p class="drop-zone-subtext">or click to browse · supports multiple files for batch</p>
             </div>
         </div>
 
@@ -263,10 +261,6 @@
                 <a href="csv-to-json-for-gst.html" class="related-card">
                     <span class="related-icon">💼</span>
                     <span class="related-title">CSV to JSON for GST Returns</span>
-                </a>
-                <a href="excel-to-json.html" class="related-card">
-                    <span class="related-icon">📊</span>
-                    <span class="related-title">Excel to JSON Converter Online</span>
                 </a>
             </div>
         </div>
