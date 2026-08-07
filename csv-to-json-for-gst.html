@@ -94,7 +94,31 @@
             "name": "How much does it cost?",
             "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "5 free conversions (each batch counts as one). For monthly GST filing, the $5 lifetime license pays for itself immediately \u2014 unlimited conversions forever, no subscription."
+                "text": "5 free conversions (each batch counts as one). For monthly GST filing, the $5 lifetime license pays for itself immediately — unlimited conversions forever, no subscription."
+            }
+        },
+        {
+            "@type": "Question",
+            "name": "Why can't I create a JSON file from the GST Offline Tool?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "The GST Offline Tool often fails to generate JSON files on large or complex CSV exports, and it requires downloading and installing software. Our browser-based converter avoids this entirely — it runs in your browser, handles large files, and generates JSON instantly without any installation."
+            }
+        },
+        {
+            "@type": "Question",
+            "name": "Do I need to download the GST Offline Tool to convert CSV to JSON?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "No. Our converter works entirely in your browser — no download, no installation, no upload. Just drop your GSTR1 or GSTR3B CSV file and get JSON instantly. This is faster and more reliable than the offline tool, and your tax data never leaves your device."
+            }
+        },
+        {
+            "@type": "Question",
+            "name": "What columns are in a GSTR1 CSV file?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "A GSTR1 CSV export typically contains columns like GSTIN, trade name, invoice number, invoice date, invoice value, taxable value, tax rate, and tax amount, organized by section (B2B, B2CL, B2CS, CDNR). Our converter reads any of these columns and maps them to JSON automatically, with nested mapping for the exact structure your GST API expects."
             }
         }
     ]
@@ -130,6 +154,21 @@
         <h2>How Batch Processing Helps with Monthly Returns</h2>
         <p>GST returns are filed monthly. If you handle multiple clients or business units, you may have dozens of CSV files each month. Batch mode lets you drop all monthly CSV exports at once and either download individual JSON files as a ZIP, or merge all data into one JSON array for consolidated reporting. This turns a repetitive monthly task into a one-click workflow.</p>
 
+        <h2>GST Offline Tool vs Browser Converter</h2>
+        <p>Many businesses struggle with the official GST Offline Tool — it requires downloading and installing software, and often fails to generate JSON on large or complex CSV exports. Here's how our browser-based converter compares:</p>
+        <table class="seo-table">
+            <thead>
+                <tr><th>Feature</th><th>GST Offline Tool</th><th>Our Browser Converter</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>Installation</td><td>Download + install required</td><td>None — runs in browser</td></tr>
+                <tr><td>Data privacy</td><td>Local, but complex setup</td><td>100% browser-side, 0 upload</td></tr>
+                <tr><td>Large files</td><td>Often fails or hangs</td><td>Handles large files smoothly</td></tr>
+                <tr><td>Batch months</td><td>One section at a time</td><td>Drop all files, batch to ZIP</td></tr>
+                <tr><td>Nested mapping</td><td>Fixed structure</td><td>Custom JSON paths for your API</td></tr>
+            </tbody>
+        </table>
+
         <h2>GST CSV to JSON Use Cases</h2>
         <ul class="seo-list">
 <li><strong>GSTR1 filing</strong> — convert outward supplies CSV to JSON for GST portal API</li>
@@ -161,6 +200,9 @@
 <details class="faq-item"><summary>Can I batch convert multiple months?</summary><p>Yes. Drop all monthly CSV files at once, select batch mode, and download all JSON files as a ZIP. Or merge all months into one consolidated JSON array.</p></details>
 <details class="faq-item"><summary>Is my GST data safe?</summary><p>Yes. All processing is 100% browser-side. Your GST data never leaves your device — no upload, no server, no cloud. This is especially important for sensitive financial and tax data.</p></details>
 <details class="faq-item"><summary>How much does it cost?</summary><p>5 free conversions (each batch counts as one). For monthly GST filing, the $5 lifetime license pays for itself immediately — unlimited conversions forever, no subscription.</p></details>
+<details class="faq-item"><summary>Why can't I create a JSON file from the GST Offline Tool?</summary><p>The GST Offline Tool often fails to generate JSON files on large or complex CSV exports, and it requires downloading and installing software. Our browser-based converter avoids this entirely — it runs in your browser, handles large files, and generates JSON instantly without any installation.</p></details>
+<details class="faq-item"><summary>Do I need to download the GST Offline Tool to convert CSV to JSON?</summary><p>No. Our converter works entirely in your browser — no download, no installation, no upload. Just drop your GSTR1 or GSTR3B CSV file and get JSON instantly. This is faster and more reliable than the offline tool, and your tax data never leaves your device.</p></details>
+<details class="faq-item"><summary>What columns are in a GSTR1 CSV file?</summary><p>A GSTR1 CSV export typically contains columns like GSTIN, trade name, invoice number, invoice date, invoice value, taxable value, tax rate, and tax amount, organized by section (B2B, B2CL, B2CS, CDNR). Our converter reads any of these columns and maps them to JSON automatically, with nested mapping for the exact structure your GST API expects.</p></details>
 
             </div>
         </div>
