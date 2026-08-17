@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy — CSV to JSON Converter</title>
+    <meta name="description" content="Privacy Policy for CSV to JSON Converter browser extension and csv-to-json.com. All data is processed locally in your browser. No data is sent to any server.">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://csv-to-json.com/privacy.html">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E📋%3C/text%3E%3C/svg%3E">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <header class="header">
+        <div class="container header-inner">
+            <a href="index.html" class="logo">
+                <span class="logo-icon">📋</span>
+                <span class="logo-text">CSV<span class="logo-accent">→</span>JSON</span>
+            </a>
+            <div class="header-badges">
+                <span class="badge badge-free">Free</span>
+                <span class="badge badge-privacy">No Upload</span>
+                <span class="badge badge-browser">Browser-Only</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="hero">
+            <div class="container">
+                <h1>Privacy Policy</h1>
+                <p class="hero-subtitle">Your data never leaves your browser. This applies to both the website and the Chrome extension.</p>
+            </div>
+        </section>
+
+        <section style="max-width: 700px; margin: 0 auto; padding: 0 24px 48px;">
+            <p style="color: var(--muted); font-size: 14px; margin-bottom: 32px;">Last updated: August 17, 2026</p>
+
+            <h2 style="font-size: 20px; margin-bottom: 12px;">Summary</h2>
+            <p style="color: var(--fg-soft); margin-bottom: 24px; line-height: 1.6;">
+                <strong>CSV to JSON Converter processes all data locally in your browser.</strong>
+                No file content, no CSV data, and no JSON output is ever sent to any server.
+                There is no analytics, no tracking, and no third-party code.
+            </p>
+
+            <h2 style="font-size: 20px; margin-bottom: 12px;">1. Data Processing</h2>
+            <p style="color: var(--fg-soft); margin-bottom: 16px; line-height: 1.6;">
+                All CSV parsing, JSON conversion, nested mapping, and batch processing happen
+                entirely within your browser using JavaScript. The extension uses the PapaParse
+                library (bundled locally) and JSZip (bundled locally) to process files.
+                No external servers are involved in data processing.
+            </p>
+
+            <h2 style="font-size: 20px; margin-bottom: 12px;">2. Data Storage</h2>
+            <p style="color: var(--fg-soft); margin-bottom: 16px; line-height: 1.6;">
+                The extension stores only the following in <code>chrome.storage.local</code>:
+            </p>
+            <ul style="color: var(--fg-soft); margin-bottom: 24px; line-height: 1.8; padding-left: 24px;">
+                <li><strong>Conversion counter</strong> — number of free conversions used (integer)</li>
+                <li><strong>Unlock status</strong> — whether you've purchased unlimited access (boolean)</li>
+            </ul>
+            <p style="color: var(--fg-soft); margin-bottom: 24px; line-height: 1.6;">
+                No file content, no file names, no CSV data, and no JSON output is stored.
+                All file data is discarded from memory immediately after conversion.
+            </p>
+
+            <h2 style="font-size: 20px; margin-bottom: 12px;">3. No Tracking</h2>
+            <p style="color: var(--fg-soft); margin-bottom: 24px; line-height: 1.6;">
+                The extension does not use Google Analytics, Google Tag Manager, Mixpanel,
+                or any other analytics or tracking service. There are no tracking pixels,
+                no cookies, and no fingerprinting.
+            </p>
+
+            <h2 style="font-size: 20px; margin-bottom: 12px;">4. No Third-Party Code</h2>
+            <p style="color: var(--fg-soft); margin-bottom: 24px; line-height: 1.6;">
+                The extension does not load any remote scripts. All code (PapaParse, JSZip,
+                and application logic) is bundled locally within the extension package.
+                The Content Security Policy restricts execution to <code>'self'</code> only.
+            </p>
+
+            <h2 style="font-size: 20px; margin-bottom: 12px;">5. Payment Verification</h2>
+            <p style="color: var(--fg-soft); margin-bottom: 16px; line-height: 1.6;">
+                If you choose to purchase unlimited access ($5 lifetime), the extension sends
+                your USDT transaction ID (TXID) to our Cloudflare Worker for verification.
+                The Worker checks the transaction via the TronScan public API and returns
+                a boolean result. Only the TXID string is transmitted — no file data.
+            </p>
+            <p style="color: var(--fg-soft); margin-bottom: 24px; line-height: 1.6;">
+                The verified TXID is stored in Cloudflare KV for 30 days to prevent replay
+                attacks. No personal information is collected or stored.
+            </p>
+
+            <h2 style="font-size: 20px; margin-bottom: 12px;">6. Permissions</h2>
+            <p style="color: var(--fg-soft); margin-bottom: 16px; line-height: 1.6;">
+                The extension requests only the <code>storage</code> permission, which is used
+                to save the conversion counter and unlock status locally on your device.
+                No <code>tabs</code>, no <code>host_permissions</code>, no content scripts,
+                and no background service workers are used.
+            </p>
+
+            <h2 style="font-size: 20px; margin-bottom: 12px;">7. Website (csv-to-json.com)</h2>
+            <p style="color: var(--fg-soft); margin-bottom: 24px; line-height: 1.6;">
+                The website operates on the same privacy principles. All file processing
+                happens client-side. No file data is uploaded. Cloudflare Web Analytics
+                (privacy-preserving, no cookies) may be used for aggregate traffic statistics.
+            </p>
+
+            <h2 style="font-size: 20px; margin-bottom: 12px;">8. Contact</h2>
+            <p style="color: var(--fg-soft); margin-bottom: 48px; line-height: 1.6;">
+                Questions about this privacy policy? Email: makszoom85@gmail.com
+            </p>
+
+            <div style="border-top: 1px solid var(--border); padding-top: 24px;">
+                <a href="index.html" style="color: var(--accent); text-decoration: none; font-weight: 500;">← Back to CSV to JSON Converter</a>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer" style="border-top: 1px solid var(--border); padding: 24px; text-align: center; color: var(--muted); font-size: 13px;">
+        <p>CSV to JSON Converter — Your data never leaves your browser.</p>
+        <p style="margin-top: 4px;"><a href="index.html" style="color: var(--accent);">Home</a> · <a href="privacy.html" style="color: var(--accent);">Privacy</a> · © 2026</p>
+    </footer>
+
+</body>
+</html>
