@@ -115,6 +115,22 @@
         },
         {
             "@type": "Question",
+            "name": "What is CSV in the GST portal?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "The GST portal doesn't accept CSV directly. The official GST Offline Tool stores your invoice data as CSV files (one per section \u2014 B2B, B2CL, B2CS, CDNR), but the portal's upload interface expects JSON. A CSV-to-JSON converter bridges that gap: export CSV from the Offline Tool, convert it, and upload valid JSON to the portal."
+            }
+        },
+        {
+            "@type": "Question",
+            "name": "Can I convert Excel to JSON for GSTR-1?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Yes \u2014 with one quick step. If your GSTR-1 invoice data is in an Excel file (.xlsx), save the sheet as CSV (File \u2192 Save As \u2192 CSV) first, then convert the CSV to JSON here. The converter doesn't read .xlsx directly, but the CSV route takes seconds and preserves all invoice columns."
+            }
+        },
+        {
+            "@type": "Question",
             "name": "What columns are in a GSTR1 CSV file?",
             "acceptedAnswer": {
                 "@type": "Answer",
@@ -151,6 +167,9 @@
         <h2>Why Convert GST CSV to JSON?</h2>
         <p>The Goods and Services Tax (GST) system in India requires businesses to file regular returns (GSTR1, GSTR3B, GSTR2A). Many accounting tools and GST APIs accept JSON format for data submission. If your GST software exports data as CSV (which most do), you need to convert it to JSON before submitting to the GST portal or feeding it into automated tax workflows.</p>
 
+        <h2>What Is CSV in the GST Portal?</h2>
+        <p>The GST portal itself does not accept CSV files for return filing. Instead, the official <strong>GST Offline Tool</strong> lets taxpayers enter invoice data in spreadsheets and then exports it. The catch: the Offline Tool saves your work as CSV files (one per section — B2B, B2CL, B2CS, CDNR), while the portal's upload interface expects <strong>JSON</strong>. So a "CSV in the GST portal" workflow really means: spreadsheet data → CSV export → JSON conversion → portal upload. Our converter covers that third step entirely in your browser: drop the CSV export, get valid JSON, and upload it to the portal or feed it to your GST API. No installation, no data leaving your device.</p>
+
         <h2>How Batch Processing Helps with Monthly Returns</h2>
         <p>GST returns are filed monthly. If you handle multiple clients or business units, you may have dozens of CSV files each month. Batch mode lets you drop all monthly CSV exports at once and either download individual JSON files as a ZIP, or merge all data into one JSON array for consolidated reporting. This turns a repetitive monthly task into a one-click workflow.</p>
 
@@ -176,6 +195,8 @@
 <li><strong>Multi-client accounting</strong> — batch convert multiple client CSVs in one operation</li>
 <li><strong>Reconciliation</strong> — convert GSTR2A purchase data CSV to JSON for matching with books</li>
 <li><strong>Audit preparation</strong> — transform annual GST data exports into structured JSON for analysis</li>
+<li><strong>Excel to JSON for GSTR-1</strong> — the GST Offline Tool works with spreadsheets, so if your invoice data lives in Excel, save the sheet as CSV and convert it to JSON here in one step</li>
+<li><strong>Building a GST JSON converter tool workflow</strong> — pipe converted JSON straight into accounting software, ERP imports, or automated filing scripts</li>
 
         </ul>
 
@@ -202,6 +223,8 @@
 <details class="faq-item"><summary>How much does it cost?</summary><p>5 free conversions (each batch counts as one). For monthly GST filing, the $5 lifetime license pays for itself immediately — unlimited conversions forever, no subscription.</p></details>
 <details class="faq-item"><summary>Why can't I create a JSON file from the GST Offline Tool?</summary><p>The GST Offline Tool often fails to generate JSON files on large or complex CSV exports, and it requires downloading and installing software. Our browser-based converter avoids this entirely — it runs in your browser, handles large files, and generates JSON instantly without any installation.</p></details>
 <details class="faq-item"><summary>Do I need to download the GST Offline Tool to convert CSV to JSON?</summary><p>No. Our converter works entirely in your browser — no download, no installation, no upload. Just drop your GSTR1 or GSTR3B CSV file and get JSON instantly. This is faster and more reliable than the offline tool, and your tax data never leaves your device.</p></details>
+<details class="faq-item"><summary>What is CSV in the GST portal?</summary><p>The GST portal doesn't accept CSV directly. The official GST Offline Tool stores your invoice data as CSV files (one per section — B2B, B2CL, B2CS, CDNR), but the portal's upload interface expects JSON. A CSV-to-JSON converter bridges that gap: export CSV from the Offline Tool, convert it, and upload valid JSON to the portal.</p></details>
+<details class="faq-item"><summary>Can I convert Excel to JSON for GSTR-1?</summary><p>Yes — with one quick step. If your GSTR-1 invoice data is in an Excel file (.xlsx), save the sheet as CSV (File → Save As → CSV) first, then convert the CSV to JSON here. The converter doesn't read .xlsx directly, but the CSV route takes seconds and preserves all invoice columns.</p></details>
 <details class="faq-item"><summary>What columns are in a GSTR1 CSV file?</summary><p>A GSTR1 CSV export typically contains columns like GSTIN, trade name, invoice number, invoice date, invoice value, taxable value, tax rate, and tax amount, organized by section (B2B, B2CL, B2CS, CDNR). Our converter reads any of these columns and maps them to JSON automatically, with nested mapping for the exact structure your GST API expects.</p></details>
 
             </div>
