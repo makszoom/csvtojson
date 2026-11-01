@@ -229,6 +229,35 @@ main.container {
     font-variant-numeric: tabular-nums;
 }
 
+/* Выбор листа Excel-книги: в выгрузках Tally/1С листов несколько (B2B, B2CL, B2CS…) */
+.sheet-pick {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.78rem;
+    color: var(--muted);
+}
+
+.sheet-select {
+    font: inherit;
+    font-size: 0.78rem;
+    padding: 4px 8px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--bg);
+    color: var(--text);
+    cursor: pointer;
+    max-width: 160px;
+}
+
+.sheet-select:active { transform: scale(0.98); transition: transform 0.1s ease-out; }
+
+@media (max-width: 560px) {
+    .file-item { flex-wrap: wrap; }
+    .sheet-pick { order: 5; width: 100%; }
+    .sheet-select { max-width: none; flex: 1; }
+}
+
 .file-item-remove {
     background: none;
     border: none;
