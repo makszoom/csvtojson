@@ -4,6 +4,17 @@
    Day 2+: PapaParse, conversion, nested mapping, batch
    ═══════════════════════════════════════════════ */
 
+/* v2.0.0 — модуль инструмента.
+   Скрипт подключается и на SEO-лендингах, поэтому:
+   1) вся работа с DOM заперта в IIFE — наружу ничего не течёт;
+   2) если разметки инструмента на странице нет — выходим сразу, без TypeError;
+   3) на лендингах разметку вставляет js/tool-embed.js ДО загрузки этого файла. */
+(function () {
+if (!document.getElementById('dropZone')) {
+    window.CSVtoJSON = { ready: false, reason: 'no-tool-markup' };
+    return;
+}
+
 // ─── DOM Elements ───
 const els = {
     dropZone:       document.getElementById('dropZone'),
@@ -409,7 +420,7 @@ function convertSingle(fileObj, delimiter, header, typeDetection, useNested, quo
     const config = {
         delimiter: delimiter === 'auto' ? '' : delimiter,
         header: header,
-        dynamicTyping: typeDetection,
+        dynamicTyping: false,   // типы приводит core.js: ведущие нули не теряются
         quotes: quoteHandling,
         skipEmptyLines: skipEmpty
     };
@@ -453,7 +464,7 @@ function convertSingle(fileObj, delimiter, header, typeDetection, useNested, quo
             delimiter: config.delimiter,
             header: header,
             skipEmptyLines: skipEmpty,
-            dynamicTyping: typeDetection,
+            dynamicTyping: false,   // типы приводит core.js: ведущие нули не теряются
             quotes: quoteHandling,
             complete: (results) => {
                 processResult(results.data, results.meta, header, useNested);
@@ -480,7 +491,7 @@ function convertBatch(delimiter, header, typeDetection, useNested, quoteHandling
     const config = {
         delimiter: delimiter === 'auto' ? '' : delimiter,
         header: header,
-        dynamicTyping: typeDetection,
+        dynamicTyping: false,   // типы приводит core.js: ведущие нули не теряются
         quotes: quoteHandling,
         skipEmptyLines: skipEmpty
     };
@@ -518,7 +529,7 @@ function convertBatch(delimiter, header, typeDetection, useNested, quoteHandling
                 delimiter: config.delimiter,
                 header: header,
                 skipEmptyLines: skipEmpty,
-                dynamicTyping: typeDetection,
+                dynamicTyping: false,   // типы приводит core.js: ведущие нули не теряются
                 quotes: quoteHandling,
                 complete: (results) => {
                     const processed = processResultSilent(results.data, header, useNested);
@@ -598,16 +609,9 @@ function updateBatchProgress(completed, total) {
 function processResultSilent(data, header, useNested) {
     let json = data;
 
-    const hasManualTypes = header && Object.values(columnTypes).some(t => t !== 'auto');
-    if (hasManualTypes && header) {
-        json = json.map(row => {
-            const result = {};
-            for (const [key, value] of Object.entries(row)) {
-                const type = columnTypes[key] || 'auto';
-                result[key] = castValue(value, type);
-            }
-            return result;
-        });
+    const typeDetectionOn = !!(els.typeDetection && els.typeDetection.value === 'true');
+    if (header && needsCast(typeDetectionOn, columnTypes)) {
+        json = castRows(json, columnTypes);
     }
 
     const hasNestedPaths = header && Object.entries(jsonPaths).some(([k, v]) => v && v.includes('.'));
@@ -621,17 +625,11 @@ function processResultSilent(data, header, useNested) {
 function processResult(data, meta, header, useNested) {
     let json = data;
 
-    // Apply manual column types if any are set (not 'auto')
-    const hasManualTypes = header && Object.values(columnTypes).some(t => t !== 'auto');
-    if (hasManualTypes && header) {
-        json = json.map(row => {
-            const result = {};
-            for (const [key, value] of Object.entries(row)) {
-                const type = columnTypes[key] || 'auto';
-                result[key] = castValue(value, type);
-            }
-            return result;
-        });
+    // Типы: детекция включена или есть ручные настройки колонок.
+    // Приведение делает core.js — он сохраняет ведущие нули (00721, 0401).
+    const typeDetectionOn = !!(els.typeDetection && els.typeDetection.value === 'true');
+    if (header && needsCast(typeDetectionOn, columnTypes)) {
+        json = castRows(json, columnTypes);
     }
 
     // Apply nested mapping: use JSON paths from inputs
@@ -663,7 +661,16 @@ function processResult(data, meta, header, useNested) {
     showToast(`Converted ${json.length} rows!`, 'success');
 }
 
-// ─── Value type casting ───
+// ─── Value type casting (реализация — js/core.js, здесь только мост) ───
+const Core = window.CSVtoJSONCore || {
+    castRow: (row) => row,
+    needsCast: () => false,
+    smartCast: (v) => v
+};
+const castRow = Core.castRow;
+const castRows = Core.castRows || ((rows) => rows);
+const needsCast = Core.needsCast;
+
 function castValue(value, type) {
     if (value === null || value === undefined || value === '') {
         if (type === 'null') return null;
@@ -1025,3 +1032,6 @@ updateCounter();
 document.getElementById('resetPathsBtn').addEventListener('click', resetJsonPaths);
 document.getElementById('saveMappingBtn').addEventListener('click', saveMapping);
 document.getElementById('loadMappingBtn').addEventListener('click', loadMapping);
+
+window.CSVtoJSON = { ready: true, version: '2.1.0', core: Core };
+})();
