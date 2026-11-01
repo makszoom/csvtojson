@@ -70,6 +70,13 @@ let columnTypes = {};
 let jsonPaths = {};
 
 // ─── Helpers ───
+// Счётчик воронки: если js/metrics.js не подключён или endpoint не задан — тихо ничего не делаем
+function trackEvent(name, extra) {
+    try {
+        if (window.CSVtoJSONMetrics) window.CSVtoJSONMetrics.track(name, { extra: extra || null });
+    } catch (e) { /* метрика не должна ломать инструмент ни при каких условиях */ }
+}
+
 function isUnlocked() {
     return localStorage.getItem(STORAGE_KEY_UNLOCKED) === 'true';
 }
@@ -149,6 +156,7 @@ function handleFiles(fileList) {
 
     renderFileList();
     showToast(`Loaded ${accepted.length} file${accepted.length > 1 ? 's' : ''}`, 'success');
+    trackEvent('file_loaded', { type: accepted.some(f => RT.isExcelName(f.name)) ? 'xlsx' : 'csv' });
 
     // Excel готовим асинхронно (ленивая загрузка SheetJS), CSV — сразу в превью
     added.forEach(item => {
@@ -459,6 +467,7 @@ function convertToJSON() {
         showToast('No files to convert', 'error');
         return;
     }
+    trackEvent('convert_click');
 
     const delimiter = els.delimiter.value;
     const header = els.headerRow.value === 'true';
@@ -955,6 +964,7 @@ function showPaywall() {
     }
 
     els.paywallModal.classList.add('open');
+    trackEvent('paywall_shown');
 }
 
 els.paywallClose.addEventListener('click', () => {
