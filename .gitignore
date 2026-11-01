@@ -4,3 +4,4 @@ backup-*/
 *.zip
 node_modules/
 tests/.cache/
+.e2e-site/
