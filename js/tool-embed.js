@@ -41,6 +41,8 @@
         'vendor/highlight.min.js',
         'vendor/highlight-json.min.js',
         'js/core.js',
+        'js/read-table.js',
+        'js/xlsx-loader.js',
         'js/app.js'
     ];
     scripts.forEach(function (src) {
