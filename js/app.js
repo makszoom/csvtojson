@@ -118,33 +118,75 @@ els.fileInput.addEventListener('change', (e) => {
 });
 
 // ─── File Handling ───
-function handleFiles(fileList) {
-    const csvFiles = Array.from(fileList).filter(f =>
-        f.name.endsWith('.csv') || f.name.endsWith('.txt') || f.name.endsWith('.tsv') || f.type === 'text/csv'
-    );
+const RT = window.CSVtoJSONReadTable || { isExcelName: () => false };
 
-    if (csvFiles.length === 0) {
-        showToast('Please drop CSV files only', 'error');
+function isAcceptedFile(f) {
+    return f.name.endsWith('.csv') || f.name.endsWith('.txt') || f.name.endsWith('.tsv') ||
+           f.type === 'text/csv' || RT.isExcelName(f.name);
+}
+
+function handleFiles(fileList) {
+    const accepted = Array.from(fileList).filter(isAcceptedFile);
+
+    if (accepted.length === 0) {
+        showToast('Please drop a CSV or Excel file (.csv, .tsv, .txt, .xlsx, .xls)', 'error');
         return;
     }
 
-    csvFiles.forEach(f => {
-        files.push({
+    const added = accepted.map(f => {
+        const item = {
             file: f,
             name: f.name,
             size: f.size,
             parsed: null,
-            data: null
-        });
+            data: null,
+            excel: null,
+            sheetName: null
+        };
+        files.push(item);
+        return item;
     });
 
     renderFileList();
-    showToast(`Loaded ${csvFiles.length} file${csvFiles.length > 1 ? 's' : ''}`, 'success');
+    showToast(`Loaded ${accepted.length} file${accepted.length > 1 ? 's' : ''}`, 'success');
 
-    // Parse first file for preview
-    if (files.length > 0) {
-        parseForPreview(files[0]);
+    // Excel готовим асинхронно (ленивая загрузка SheetJS), CSV — сразу в превью
+    added.forEach(item => {
+        if (RT.isExcelName(item.name)) prepareExcel(item);
+    });
+    const first = files[0];
+    if (first && !RT.isExcelName(first.name)) parseForPreview(first);
+}
+
+// ─── Excel: книга -> CSV в памяти, дальше конвейер тот же, что у CSV ───
+async function prepareExcel(fileObj) {
+    try {
+        const XLSX = await window.loadXLSX();
+        const buf = await fileObj.file.arrayBuffer();
+        const workbook = XLSX.read(new Uint8Array(buf), { type: 'array', cellDates: true });
+        if (!workbook.SheetNames || workbook.SheetNames.length === 0) {
+            throw new Error('в книге нет листов');
+        }
+        fileObj.excel = { names: workbook.SheetNames.slice(), index: RT.pickDefaultSheet(XLSX, workbook), workbook };
+        applySheetToFile(fileObj, fileObj.excel.index);
+        showToast(`Excel: лист «${fileObj.excel.names[fileObj.excel.index]}»` +
+                  (fileObj.excel.names.length > 1 ? `, листов в книге: ${fileObj.excel.names.length}` : ''), 'success');
+    } catch (err) {
+        showToast('Excel: ' + err.message, 'error');
     }
+}
+
+function applySheetToFile(fileObj, sheetIndex) {
+    const XLSX = window.XLSX;
+    const csv = RT.workbookToCsv(XLSX, fileObj.excel.workbook, sheetIndex);
+    fileObj.excel.index = sheetIndex;
+    fileObj.sheetName = fileObj.excel.names[sheetIndex];
+    const base = fileObj.name.replace(/\.(xlsx|xlsm|xls)$/i, '');
+    fileObj.file = new File([csv], `${base} — ${fileObj.sheetName}.csv`, { type: 'text/csv' });
+    fileObj.size = fileObj.file.size;
+    fileObj.parsed = null;
+    renderFileList();
+    if (files.indexOf(fileObj) === 0) parseForPreview(fileObj);
 }
 
 // ─── File List Rendering ───
@@ -167,14 +209,35 @@ function renderFileList() {
         els.batchControls.style.display = 'none';
     }
 
-    els.fileList.innerHTML = files.map((f, i) => `
+    els.fileList.innerHTML = files.map((f, i) => {
+        const sheetPicker = (f.excel && f.excel.names.length > 1)
+            ? `<label class="sheet-pick">
+                   <span>Sheet</span>
+                   <select class="sheet-select" data-index="${i}">
+                       ${f.excel.names.map((n, si) => `<option value="${si}"${si === f.excel.index ? ' selected' : ''}>${escapeHtml(n)}</option>`).join('')}
+                   </select>
+               </label>`
+            : '';
+        return `
         <div class="file-item">
-            <span class="file-item-icon">📄</span>
+            <span class="file-item-icon">${f.excel ? '📊' : '📄'}</span>
             <span class="file-item-name">${escapeHtml(f.name)}</span>
             <span class="file-item-size">${formatSize(f.size)}</span>
+            ${sheetPicker}
             <button class="file-item-remove" data-index="${i}">✕</button>
-        </div>
-    `).join('');
+        </div>`;
+    }).join('');
+
+    // Переключение листа в книге
+    els.fileList.querySelectorAll('.sheet-select').forEach(sel => {
+        sel.addEventListener('change', (e) => {
+            const idx = parseInt(e.target.dataset.index);
+            const fileObj = files[idx];
+            if (fileObj && fileObj.excel) {
+                applySheetToFile(fileObj, parseInt(e.target.value));
+            }
+        });
+    });
 
     // Remove buttons
     els.fileList.querySelectorAll('.file-item-remove').forEach(btn => {
