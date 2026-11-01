@@ -56,11 +56,11 @@
     <main class="container">
         <!-- Drop Zone -->
         <div class="drop-zone" id="dropZone">
-            <input type="file" id="fileInput" accept=".csv,.txt,.tsv" multiple hidden>
+            <input type="file" id="fileInput" accept=".csv,.txt,.tsv,.xlsx,.xls" multiple hidden>
             <div class="drop-zone-content">
                 <div class="drop-zone-icon">📄</div>
-                <p class="drop-zone-text">Drop CSV file here</p>
-                <p class="drop-zone-subtext">or click to browse · supports multiple files for batch</p>
+                <p class="drop-zone-text">Drop CSV or Excel file here</p>
+                <p class="drop-zone-subtext">.csv, .tsv, .xlsx, .xls · multiple files for batch · nothing is uploaded</p>
             </div>
         </div>
 
@@ -309,6 +309,8 @@
     <div class="toast-container" id="toastContainer"></div>
 
     <script src="js/core.js"></script>
+    <script src="js/read-table.js"></script>
+    <script src="js/xlsx-loader.js"></script>
     <script src="js/app.js"></script>
 </body>
 </html>
