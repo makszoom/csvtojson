@@ -1,0 +1,16 @@
+{
+  "name": "csvtojson-site",
+  "version": "2.0.0",
+  "private": true,
+  "description": "csv-to-json.com — browser-side CSV/Excel to JSON converter",
+  "scripts": {
+    "test": "node tests/unit/run.js && node tests/e2e/run.js",
+    "test:unit": "node tests/unit/run.js",
+    "test:e2e": "node tests/e2e/run.js",
+    "test:live": "node tests/e2e/run.js --live",
+    "build": "python scripts/build-tool-markup.py"
+  },
+  "devDependencies": {
+    "ws": "^8.18.0"
+  }
+}
