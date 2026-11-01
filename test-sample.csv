@@ -1,0 +1,6 @@
+name,age,address.city,address.zip,is_active,items.0.title,items.0.price
+Alice,30,Moscow,123456,true,Coffee,4.50
+Bob,25,Kazan,654321,false,Tea,2.00
+Charlie,35,Novosibirsk,630090,true,Cake,12.99
+Diana,28,Saint Petersburg,190000,true,Book,15.00
+Eve,40,Vladivostok,690000,false,Phone,899.99

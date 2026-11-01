@@ -1,0 +1,6 @@
+.env
+*.env
+backup-*/
+*.zip
+node_modules/
+tests/.cache/
