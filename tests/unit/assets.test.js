@@ -32,4 +32,11 @@ const index = read('index.html');
 ok('index.html: core.js подключён', index.includes('js/core.js'));
 ok('index.html: core.js раньше app.js',
    index.indexOf('js/core.js') < index.indexOf('js/app.js'));
+ok('index.html: read-table.js раньше app.js',
+   index.indexOf('js/read-table.js') !== -1 && index.indexOf('js/read-table.js') < index.indexOf('js/app.js'));
+ok('index.html: xlsx-loader.js раньше app.js',
+   index.indexOf('js/xlsx-loader.js') !== -1 && index.indexOf('js/xlsx-loader.js') < index.indexOf('js/app.js'));
+ok('index.html: input принимает Excel', index.includes('.xlsx,.xls'));
+ok('SheetJS лежит у нас и грузится лениво (в разметке его нет)',
+   fs.existsSync(path.join(ROOT, 'vendor/xlsx.full.min.js')) && !index.includes('xlsx.full.min.js'));
 ok('index.html: вендоры локальные', index.includes('vendor/papaparse.min.js'));

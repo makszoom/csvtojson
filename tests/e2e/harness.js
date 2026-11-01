@@ -111,4 +111,24 @@ function dropFile(evalJS, { inputId = 'fileInput', name = 'sample.csv', text = '
     `);
 }
 
-module.exports = { connect, openPage, send, sleep, collectors, resetCollectors, dropFile, LF };
+/* Подача бинарного файла (Excel): base64 -> Uint8Array -> File. */
+function dropBinary(evalJS, { inputId = 'fileInput', name = 'book.xlsx', base64 = '', mime = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }) {
+    return evalJS(`
+        (() => {
+            const b64 = "${base64}";
+            const bin = atob(b64);
+            const bytes = new Uint8Array(bin.length);
+            for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+            const file = new File([bytes], "${name}", { type: "${mime}" });
+            const dt = new DataTransfer();
+            dt.items.add(file);
+            const input = document.getElementById("${inputId}");
+            if (!input) return { ok: false, why: "no-input" };
+            input.files = dt.files;
+            input.dispatchEvent(new Event("change", { bubbles: true }));
+            return { ok: true };
+        })()
+    `);
+}
+
+module.exports = { connect, openPage, send, sleep, collectors, resetCollectors, dropFile, dropBinary, LF };

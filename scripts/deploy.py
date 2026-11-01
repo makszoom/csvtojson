@@ -33,8 +33,7 @@ MAP_EXTRA = {
 
 # что НЕ деплоим никогда
 SKIP_PREFIX = ("tests/", "node_modules/", ".e2e-site/", "docs/", "backup", ".env", "package",
-               "scripts/", ".gitignore", "README",
-               "vendor/xlsx")  # SheetJS поедет в Фазе 2, сейчас не нужен на сайте
+               "scripts/", ".gitignore", "README")
 
 
 def env_token():
@@ -74,6 +73,10 @@ def main():
         message = sys.argv[sys.argv.index("--message") + 1]
 
     files = changed_files()
+    # --also vendor/xlsx.full.min.js: файл уже в локальном git, но на сайте его нет
+    if "--also" in sys.argv:
+        extra = sys.argv[sys.argv.index("--also") + 1].split(",")
+        files = files + [f for f in extra if f not in files and os.path.isfile(os.path.join(ROOT, f))]
     if not files:
         print("нечего деплоить")
         return 0
