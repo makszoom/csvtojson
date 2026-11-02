@@ -15,7 +15,7 @@
 })(typeof globalThis !== 'undefined' ? globalThis : this, function () {
     'use strict';
 
-    var METRICS_URL = '';   // например 'https://csvtojson-metrics.makszoom85.workers.dev/t'
+    var METRICS_URL = 'https://csvtojson-metrics.makszoom85.workers.dev/t';
 
     var EVENTS = ['page_view', 'file_loaded', 'convert_click', 'download_click', 'paywall_shown', 'payment_verified'];
 

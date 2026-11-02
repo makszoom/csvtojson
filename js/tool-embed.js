@@ -43,6 +43,7 @@
         'js/core.js',
         'js/read-table.js',
         'js/xlsx-loader.js',
+        'js/metrics.js',
         'js/app.js'
     ];
     scripts.forEach(function (src) {

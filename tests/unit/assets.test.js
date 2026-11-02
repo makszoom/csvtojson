@@ -40,3 +40,6 @@ ok('index.html: input принимает Excel', index.includes('.xlsx,.xls'));
 ok('SheetJS лежит у нас и грузится лениво (в разметке его нет)',
    fs.existsSync(path.join(ROOT, 'vendor/xlsx.full.min.js')) && !index.includes('xlsx.full.min.js'));
 ok('index.html: вендоры локальные', index.includes('vendor/papaparse.min.js'));
+ok('index.html: metrics.js подключён до app.js',
+   index.indexOf('js/metrics.js') !== -1 && index.indexOf('js/metrics.js') < index.indexOf('js/app.js'));
+ok('privacy.html: описан анонимный счётчик', read('privacy.html').includes('Anonymous usage counters'));

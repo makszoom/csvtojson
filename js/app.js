@@ -922,6 +922,7 @@ function fallbackCopy(text) {
 
 // ─── Download JSON ───
 els.downloadBtn.addEventListener('click', () => {
+    trackEvent('download_click');
     const text = els.jsonOutput.textContent;
     if (!text) return;
 
@@ -1029,6 +1030,7 @@ document.getElementById('verifyBtn').addEventListener('click', async () => {
         const data = await response.json();
 
         if (data.verified) {
+            trackEvent('payment_verified');
             statusEl.textContent = '✅ Payment verified! Unlocking...';
             statusEl.className = 'payment-status success';
 
@@ -1100,6 +1102,7 @@ els.downloadZipBtn.addEventListener('click', async () => {
 
 // ─── Init ───
 updateCounter();
+trackEvent('page_view');
 
 // ─── Mapping control buttons ───
 document.getElementById('resetPathsBtn').addEventListener('click', resetJsonPaths);

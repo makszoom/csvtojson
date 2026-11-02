@@ -21,8 +21,10 @@ ok('в payload нет ключей с IP/UA/cookie',
    Object.keys(M.buildPayload('page_view', '/')).every((k) => ['e', 'p', 't'].includes(k)));
 
 // по умолчанию (endpoint пустой) — молчим, никаких запросов
-ok('пока endpoint не задан, счётчик выключен', M.isEnabled() === false);
-ok('track() при выключенном счётчике возвращает false', M.track('page_view', {}) === false);
+ok('endpoint задан (воркер задеплоен)', M.isEnabled() === true);
+ok('endpoint — наш собственный воркер', /^https:\/\/csvtojson-metrics\.\w+\.workers\.dev\/t$/.test(
+    require('fs').readFileSync(require('path').join(__dirname, '..', '..', 'js', 'metrics.js'), 'utf8')
+        .match(/METRICS_URL = '([^']*)'/)[1]));
 
 // DNT
 ok('Do Not Track = 1 отключает отправку', M.dntEnabled({ doNotTrack: '1' }) === true);
@@ -32,10 +34,9 @@ ok('обычный браузер считается', M.dntEnabled({ doNotTrack
 // включённый счётчик шлёт ровно то, что задумано
 let sent = null;
 const fakeNav = { doNotTrack: null, sendBeacon: (url, blob) => { sent = { url: url, blob: blob }; return true; } };
-M.setEndpoint('https://example.workers.dev/t');
-ok('endpoint включил счётчик', M.isEnabled() === true);
+ok('счётчик включён', M.isEnabled() === true);
 ok('track отправляет beacon', M.track('paywall_shown', { path: '/index.html', navigator: fakeNav }) === true);
-ok('URL отправки — наш воркер', sent && sent.url === 'https://example.workers.dev/t', JSON.stringify(sent && sent.url));
+ok('URL отправки — наш воркер', sent && /csvtojson-metrics/.test(sent.url) && sent.url.endsWith('/t'), JSON.stringify(sent && sent.url));
 ok('невалидное событие не отправляется', M.track('hack', { navigator: fakeNav }) === false);
 ok('DNT блокирует отправку при включённом endpoint',
    M.track('page_view', { navigator: { doNotTrack: '1' } }) === false);

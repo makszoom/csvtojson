@@ -46,9 +46,12 @@ def write_env_key(key, value):
 def main():
     dry = "--dry-run" in sys.argv
     env = read_env()
-    token = env.get("CLOUDFLARE_API_TOKEN")
+    # деплой-токен с правами Workers Scripts:Write; старый CLOUDFLARE_API_TOKEN — только чтение
+    token = env.get("CLOUDFLARE_API_TOKEN_DEPLOY") or env.get("CLOUDFLARE_API_TOKEN")
     if not token:
-        raise SystemExit("CLOUDFLARE_API_TOKEN не найден в .env")
+        raise SystemExit("нет токена: добавь CLOUDFLARE_API_TOKEN_DEPLOY в .env")
+    if not env.get("CLOUDFLARE_API_TOKEN_DEPLOY"):
+        print("ВНИМАНИЕ: используется старый CLOUDFLARE_API_TOKEN (вероятно read-only)")
 
     stats_key = env.get("METRICS_STATS_KEY") or secrets.token_hex(16)
 
