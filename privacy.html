@@ -35,13 +35,15 @@
         </section>
 
         <section style="max-width: 700px; margin: 0 auto; padding: 0 24px 48px;">
-            <p style="color: var(--muted); font-size: 14px; margin-bottom: 32px;">Last updated: August 17, 2026</p>
+            <p style="color: var(--muted); font-size: 14px; margin-bottom: 32px;">Last updated: November 2, 2026</p>
 
             <h2 style="font-size: 20px; margin-bottom: 12px;">Summary</h2>
             <p style="color: var(--fg-soft); margin-bottom: 24px; line-height: 1.6;">
                 <strong>CSV to JSON Converter processes all data locally in your browser.</strong>
                 No file content, no CSV data, and no JSON output is ever sent to any server.
-                There is no analytics, no tracking, and no third-party code.
+                There are no third-party analytics, no advertising trackers and no cookies.
+                We count six anonymous usage events on our own server (see section 4) — no IP address,
+                no cookies, no identifiers and never the contents of your files.
             </p>
 
             <h2 style="font-size: 20px; margin-bottom: 12px;">1. Data Processing</h2>
@@ -72,7 +74,25 @@
                 no cookies, and no fingerprinting.
             </p>
 
-            <h2 style="font-size: 20px; margin-bottom: 12px;">4. No Third-Party Code</h2>
+            <h2 style="font-size: 20px; margin-bottom: 12px;">4. Anonymous usage counters (website only)</h2>
+            <p style="color: var(--fg-soft); margin-bottom: 16px; line-height: 1.6;">
+                On the website we count six anonymous events on our own Cloudflare Worker
+                (<code>csvtojson-metrics</code>): page view, file loaded (CSV or Excel), convert clicked,
+                download clicked, paywall shown, payment verified. This is how we know whether the tool
+                actually works for people — before this we had no numbers at all.
+            </p>
+            <ul style="color: var(--fg-soft); margin-bottom: 16px; line-height: 1.8; padding-left: 24px;">
+                <li><strong>Sent:</strong> event name, page path, and for uploads only the word &laquo;csv&raquo; or &laquo;xlsx&raquo;</li>
+                <li><strong>Not sent:</strong> IP address, User-Agent, cookies, any identifier, file names, file contents, converted JSON</li>
+                <li><strong>Stored:</strong> daily aggregate integers for 120 days, on our own key-value store</li>
+                <li><strong>Opt-out:</strong> Do Not Track or Global Privacy Control in your browser disables counting entirely</li>
+            </ul>
+            <p style="color: var(--fg-soft); margin-bottom: 24px; line-height: 1.6;">
+                No third party ever receives this data and it cannot identify a person.
+                The Chrome extension does not send these events at all.
+            </p>
+
+            <h2 style="font-size: 20px; margin-bottom: 12px;">4b. No Third-Party Code</h2>
             <p style="color: var(--fg-soft); margin-bottom: 24px; line-height: 1.6;">
                 The extension does not load any remote scripts. All code (PapaParse, JSZip,
                 and application logic) is bundled locally within the extension package.
