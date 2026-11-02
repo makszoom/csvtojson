@@ -56,13 +56,15 @@
 
         try {
             if (nav && typeof nav.sendBeacon === 'function') {
-                var blob = new Blob([body], { type: 'application/json' });
+                // text/plain — CORS-safelisted тип: preflight не нужен, иначе браузер
+                // молча отбрасывает beacon (Blob с application/json требует preflight)
+                var blob = new Blob([body], { type: 'text/plain;charset=UTF-8' });
                 if (nav.sendBeacon(METRICS_URL, blob)) return true;
             }
             if (doFetch) {
                 doFetch(METRICS_URL, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
                     body: body,
                     keepalive: true,
                     mode: 'cors'

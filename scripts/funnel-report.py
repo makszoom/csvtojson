@@ -12,7 +12,9 @@ funnel-report.py — сводка воронки из воркера csvtojson-m
 import json
 import os
 import sys
-from urllib.request import urlopen
+from urllib.request import Request, urlopen
+
+UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BASE = "https://csvtojson-metrics.makszoom85.workers.dev"
@@ -35,7 +37,9 @@ def main():
     if not key:
         raise SystemExit("METRICS_STATS_KEY не найден в .env — сначала задеплой воркер")
 
-    with urlopen(f"{BASE}/stats?days={days}&key={key}", timeout=30) as r:
+    # Cloudflare отдаёт 403 на запросы без User-Agent, поэтому представляемся браузером
+    req = Request(f"{BASE}/stats?days={days}&key={key}", headers={"User-Agent": UA})
+    with urlopen(req, timeout=30) as r:
         data = json.load(r).get("data", {})
 
     if not data:
