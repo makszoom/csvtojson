@@ -94,7 +94,7 @@
             "name": "Does no-upload mean no tracking?",
             "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "Correct. We don't use Google Analytics, tracking pixels, or any third-party analytics. The only external request is the payment Worker (Cloudflare), and only when you initiate a payment."
+                "text": "Correct: no Google Analytics, no tracking pixels, no third-party analytics, no cookies. Two requests go to our own Cloudflare Workers, and only these two: an anonymous counter (event name and page path — no IP, no cookies, no file data; disabled if your browser sends Do Not Track) and the payment Worker, which is called only when you initiate a payment."
             }
         }
     ]
@@ -161,7 +161,7 @@
 <details class="faq-item"><summary>Can I use it offline?</summary><p>After the page loads for the first time, the tool works without internet. The only network request after page load is the payment verification (only when you choose to buy the lifetime license).</p></details>
 <details class="faq-item"><summary>Is browser-side processing slower?</summary><p>No. For files under 10MB, browser-side parsing is often faster than upload-and-process because there's no network transfer time. Web Workers handle large files without freezing the UI.</p></details>
 <details class="faq-item"><summary>What about file size limits?</summary><p>Files up to 50MB work smoothly. Browser memory is the only constraint — there's no server-imposed limit like with upload-based tools.</p></details>
-<details class="faq-item"><summary>Does no-upload mean no tracking?</summary><p>Correct. We don't use Google Analytics, tracking pixels, or any third-party analytics. The only external request is the payment Worker (Cloudflare), and only when you initiate a payment.</p></details>
+<details class="faq-item"><summary>Does no-upload mean no tracking?</summary><p>Correct: no Google Analytics, no tracking pixels, no third-party analytics, no cookies. Two requests go to our own Cloudflare Workers, and only these two: an anonymous counter (event name and page path — no IP, no cookies, no file data; disabled if your browser sends Do Not Track) and the payment Worker, which is called only when you initiate a payment.</p></details>
 
             </div>
         </div>
