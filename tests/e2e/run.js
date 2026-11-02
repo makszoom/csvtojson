@@ -105,6 +105,10 @@ const CSV = 'invoice_no,hsn,taxable,party\n00721,0401,1500.50,"Ann, Ltd"\n00012,
         ok('HSN 0401 сохранил ведущий ноль', out.includes('0401'));
         ok('колонка HSN целиком строковая (9999 тоже в кавычках)', out.includes('"9999"'), out.slice(0, 300));
         ok('обычное число стало числом', /1500\.5|1500\.50/.test(out) && !out.includes('"1500.5'));
+        await send('Page.setDownloadBehavior', { behavior: 'deny' }, p.sessionId).catch(() => {});
+        await p.evalJS('document.getElementById("downloadBtn").click()');
+        await new Promise((r) => setTimeout(r, 300));
+        ok('кнопка скачивания не падает', (await p.evalJS('document.getElementById("jsonOutput").textContent')).length > 20);
         ok('ошибок JS на главной нет', collectors.exceptions.length === 0, collectors.exceptions.join(' | '));
 
         // ── 2. Пейволл после 5 конверсий ──

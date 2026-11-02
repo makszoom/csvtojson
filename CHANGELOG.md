@@ -54,3 +54,15 @@
 - `js/metrics.js` + `workers/metrics-worker.js`: 6 событий (page_view, file_loaded, convert_click, download_click, paywall_shown, payment_verified), без IP, cookies, User-Agent и содержимого файлов; уважается Do Not Track / Global Privacy Control.
 - Вызовы в `app.js` уже стоят и **инертны**: пока endpoint не задан, ни одного сетевого запроса не уходит — privacy-текст сайта остаётся правдой.
 - Блокер: у токена Cloudflare нет права `Workers Scripts:Edit` (PUT нового воркера → 403 «No access to the specified resource»). Нужен токен с шаблоном «Edit Cloudflare Workers». После этого: `python scripts/deploy-metrics-worker.py` → прописать URL в `METRICS_URL` → обновить privacy.html.
+
+## 2026-11-02 — Фаза 4 ЗАКРЫТА: счётчик воронки живой
+
+- Деплой-токен Cloudflare с `Workers Scripts:Write` получен от Макса → в `.env` как `CLOUDFLARE_API_TOKEN_DEPLOY`.
+- Воркер `csvtojson-metrics` задеплоен через REST (`scripts/deploy-metrics-worker.py`), KV-биндинг на `CSVTOJSON_KV`, ключ статистики в `.env` (`METRICS_STATS_KEY`).
+- `js/metrics.js`: endpoint прописан, 6 событий, Do Not Track / GPC отключают отправку.
+- Найден и починен баг отправки: `sendBeacon` с Blob типа `application/json` требует preflight, которого beacon не делает → запрос молча не уходил. Переведено на `text/plain;charset=UTF-8` (CORS-safelisted). Проверено на живом сайте: события доходят.
+- `privacy.html`: добавлен раздел «4. Anonymous usage counters (website only)» с точным перечнем того, что отправляется и что нет; раздел «No Third-Party Code» стал 4b. Формулировка в FAQ про «единственный внешний запрос» исправлена — теперь честно про два своих воркера.
+- `scripts/funnel-report.py` — сводка по дням, конверсии между шагами, разбивка по страницам (Cloudflare отбивает запросы без User-Agent, поэтому в скрипте браузерный UA).
+- Живая проверка: после прогона live E2E в счётчике 17 просмотров, 9 загрузок файлов (6 csv + 3 xlsx), 8 кликов конвертации, 2 показа пейволла.
+
+Следующее по плану: наблюдение 7 и 14 дней (позиция GST-страницы, CTR кластера «excel»), затем решение по Фазе 5 (GSTR-1-режим).
