@@ -74,8 +74,10 @@ def main():
     pages = {}
     for day, row in data.items():
         for k, v in row.items():
-            if k.count(":") >= 1 and not k.startswith("convert_click:type"):
+            if k.count(":") >= 1 and not k.startswith(("convert_click:type", "file_loaded:type")):
                 event, path = k.split(":", 1)
+                if path.startswith("ref:") or path.startswith("type:"):
+                    continue
                 pages.setdefault(path, {}).setdefault(event, 0)
                 pages[path][event] += v
     if pages:
@@ -83,6 +85,22 @@ def main():
         for path, ev in sorted(pages.items(), key=lambda x: -x[1].get("page_view", 0))[:10]:
             print(f"  {path:<38} views {ev.get('page_view', 0):<5} files {ev.get('file_loaded', 0):<5} "
                   f"convert {ev.get('convert_click', 0):<5} paywall {ev.get('paywall_shown', 0)}")
+
+    # Источники перехода = каналы. Пустой источник означает «зашли напрямую или из поиска».
+    refs = {}
+    for day, row in data.items():
+        for k, v in row.items():
+            if ":ref:" not in k:
+                continue
+            event, _, host = k.partition(":ref:")
+            refs.setdefault(host, {}).setdefault(event, 0)
+            refs[host][event] += v
+    print("\nПо источникам перехода (каналы):")
+    if not refs:
+        print("  пока никто не пришёл по внешней ссылке — счётчик источника пуст")
+    for host, ev in sorted(refs.items(), key=lambda x: -x[1].get("page_view", 0)):
+        print(f"  {host:<28} views {ev.get('page_view', 0):<5} files {ev.get('file_loaded', 0):<5} "
+              f"convert {ev.get('convert_click', 0):<5} download {ev.get('download_click', 0)}")
 
 
 if __name__ == "__main__":

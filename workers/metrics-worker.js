@@ -69,6 +69,11 @@ async function handleEvent(request, env) {
   if (body.t && /^[a-z]{2,8}$/.test(String(body.t))) {
     jobs.push(bump(kv, `ev:${day}:${event}:type:${body.t}`));
   }
+  // Источник перехода: только домен (caclubindia.com), без пути и query.
+  // Нужен, чтобы отличить визит из обсуждения от визита из поиска.
+  if (body.r && /^[a-z0-9.-]{3,60}$/i.test(String(body.r))) {
+    jobs.push(bump(kv, `ev:${day}:${event}:ref:${String(body.r).toLowerCase()}`));
+  }
   await Promise.all(jobs);
 
   return new Response(JSON.stringify({ ok: true }), { status: 200, headers: CORS });
