@@ -30,9 +30,29 @@
         return n.doNotTrack === '1' || n.msDoNotTrack === '1' || n.globalPrivacyControl === true;
     }
 
+    /* Источник перехода: только hostname реферера, без пути, без query.
+       Свой же домен источником не считается. Нужен, чтобы отличать визит
+       из обсуждения (caclubindia.com) от визита из поиска — иначе канал
+       не измерить. Полный URL не отправляем: в нём бывают токены и запросы. */
+    function referrerHost(doc, ownHost) {
+        var ref = (doc && doc.referrer) || '';
+        if (!ref) return '';
+        var host = '', own = '';
+        try {
+            host = String(new URL(ref).hostname || '').toLowerCase().replace(/^www\./, '');
+            own = String(ownHost || (typeof location !== 'undefined' && location.hostname) || '')
+                .toLowerCase().replace(/^www\./, '');
+        } catch (e) {
+            return '';
+        }
+        if (!host || host === own) return '';
+        return host.slice(0, 60);
+    }
+
     function buildPayload(event, path, extra) {
         var payload = { e: String(event || ''), p: String(path || '/').slice(0, 120) };
         if (extra && extra.type) payload.t = String(extra.type).slice(0, 8);
+        if (extra && extra.ref) payload.r = String(extra.ref).slice(0, 60);
         return payload;
     }
 
@@ -49,7 +69,12 @@
         // navigator/fetch можно подставить явно — так модуль тестируется без браузера
 
 
-        var payload = buildPayload(event, opts.path || (typeof location !== 'undefined' ? location.pathname : '/'), opts.extra);
+        var extra = opts.extra || {};
+        if (!extra.ref) {
+            var rh = referrerHost(opts.document || (typeof document !== 'undefined' ? document : null), opts.ownHost);
+            if (rh) extra = { type: extra.type, ref: rh };
+        }
+        var payload = buildPayload(event, opts.path || (typeof location !== 'undefined' ? location.pathname : '/'), extra);
         var body = JSON.stringify(payload);
         var nav = opts.navigator || (typeof navigator !== 'undefined' ? navigator : null);
         var doFetch = opts.fetchImpl || (typeof fetch === 'function' ? fetch : null);
@@ -82,6 +107,7 @@
         isEnabled: isEnabled,
         isValidEvent: isValidEvent,
         buildPayload: buildPayload,
+        referrerHost: referrerHost,
         dntEnabled: dntEnabled,
         EVENTS: EVENTS.slice(),
         setEndpoint: function (url) { METRICS_URL = String(url || ''); },
