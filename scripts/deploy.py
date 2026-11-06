@@ -29,6 +29,7 @@ MAP_EXTRA = {
     "seo/convert-csv-to-json.html": "convert-csv-to-json.html",
     "seo/csv-to-json-batch.html": "csv-to-json-batch.html",
     "seo/csv-to-nested-json.html": "csv-to-nested-json.html",
+    "seo/gstr1-json-to-excel.html": "gstr1-json-to-excel.html",
 }
 
 # что НЕ деплоим никогда

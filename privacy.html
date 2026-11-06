@@ -82,8 +82,8 @@
                 actually works for people — before this we had no numbers at all.
             </p>
             <ul style="color: var(--fg-soft); margin-bottom: 16px; line-height: 1.8; padding-left: 24px;">
-                <li><strong>Sent:</strong> event name, page path, and for uploads only the word &laquo;csv&raquo; or &laquo;xlsx&raquo;</li>
-                <li><strong>Not sent:</strong> IP address, User-Agent, cookies, any identifier, file names, file contents, converted JSON</li>
+                <li><strong>Sent:</strong> event name, page path, the referring site's domain only (for example <code>caclubindia.com</code> &mdash; no path, no query string), and for uploads only the word &laquo;csv&raquo;, &laquo;xlsx&raquo; or &laquo;zip&raquo;</li>
+                <li><strong>Not sent:</strong> IP address, User-Agent, cookies, any identifier, file names, file contents, converted JSON, the full referring URL</li>
                 <li><strong>Stored:</strong> daily aggregate integers for 120 days, on our own key-value store</li>
                 <li><strong>Opt-out:</strong> Do Not Track or Global Privacy Control in your browser disables counting entirely</li>
             </ul>

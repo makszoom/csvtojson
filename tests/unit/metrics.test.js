@@ -18,7 +18,24 @@ eq('payload с типом файла (для file_loaded)',
    M.buildPayload('file_loaded', '/', { type: 'xlsx' }),
    { e: 'file_loaded', p: '/', t: 'xlsx' });
 ok('в payload нет ключей с IP/UA/cookie',
-   Object.keys(M.buildPayload('page_view', '/')).every((k) => ['e', 'p', 't'].includes(k)));
+   Object.keys(M.buildPayload('page_view', '/')).every((k) => ['e', 'p', 't', 'r'].includes(k)));
+
+// ── источник перехода (referrer host) — для замера каналов ──
+eq('payload с источником перехода',
+   M.buildPayload('page_view', '/', { ref: 'caclubindia.com' }),
+   { e: 'page_view', p: '/', r: 'caclubindia.com' });
+eq('referrer host: внешний домен без www',
+   M.referrerHost({ referrer: 'https://www.caclubindia.com/forum/x-614623.asp?q=1' }, 'csv-to-json.com'),
+   'caclubindia.com');
+eq('referrer host: свой же домен не считается источником',
+   M.referrerHost({ referrer: 'https://csv-to-json.com/csv-to-json' }, 'csv-to-json.com'), '');
+eq('referrer host: пустой referrer -> пусто', M.referrerHost({ referrer: '' }, 'csv-to-json.com'), '');
+eq('referrer host: битый URL -> пусто', M.referrerHost({ referrer: 'not a url' }, 'csv-to-json.com'), '');
+eq('referrer host: нет документа -> пусто', M.referrerHost(null, 'csv-to-json.com'), '');
+ok('в источнике нет пути и query (только хост)',
+   !/[\/?]/.test(M.referrerHost({ referrer: 'https://www.google.com/search?q=x' }, 'csv-to-json.com')));
+ok('длинный хост обрезается',
+   M.referrerHost({ referrer: 'https://' + 'a'.repeat(120) + '.com/x' }, 'csv-to-json.com').length <= 60);
 
 // по умолчанию (endpoint пустой) — молчим, никаких запросов
 ok('endpoint задан (воркер задеплоен)', M.isEnabled() === true);

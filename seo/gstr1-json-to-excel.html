@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GSTR-1 JSON to Excel Converter — All Sections, No Upload</title>
+    <meta name="description" content="Convert a GSTR-1 JSON file or the portal ZIP into a multi-sheet Excel workbook: B2B, B2CL, B2CS, CDNR, EXP, HSN, DOC, NIL plus a totals summary. Runs in your browser — the client's file never leaves your machine.">
+    <link rel="canonical" href="https://csv-to-json.com/gstr1-json-to-excel">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E📑%3C/text%3E%3C/svg%3E">
+    <link rel="stylesheet" href="css/style.css">
+
+    <meta property="og:title" content="GSTR-1 JSON to Excel Converter — All Sections, No Upload">
+    <meta property="og:description" content="Turn a GSTR-1 JSON (or the portal ZIP) into a multi-sheet Excel workbook with a totals summary. 100% browser-side: the file never leaves your machine.">
+    <meta property="og:url" content="https://csv-to-json.com/gstr1-json-to-excel">
+    <meta property="og:type" content="website">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="GSTR-1 JSON to Excel Converter — All Sections, No Upload">
+    <meta name="twitter:description" content="Turn a GSTR-1 JSON (or the portal ZIP) into a multi-sheet Excel workbook with a totals summary. 100% browser-side.">
+
+    <script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    "name": "How to convert GSTR-1 JSON to Excel",
+    "description": "Drop a GSTR-1 JSON file or the ZIP downloaded from the GST portal and get a multi-sheet Excel workbook with every section and a totals summary.",
+    "totalTime": "PT1M",
+    "step": [
+        { "@type": "HowToStep", "position": 1, "name": "Get the JSON", "text": "Download the GSTR-1 JSON from the GST portal, or use the ZIP file as it is." },
+        { "@type": "HowToStep", "position": 2, "name": "Drop it here", "text": "Drag the file into the box. Several files or a whole financial year of ZIPs can be dropped at once and merged into one workbook." },
+        { "@type": "HowToStep", "position": 3, "name": "Download Excel", "text": "Check the Summary sheet, then download a workbook with one sheet per section." }
+    ]
+}
+    </script>
+
+    <script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+        {
+            "@type": "Question",
+            "name": "Is the client's GSTR-1 data uploaded anywhere?",
+            "acceptedAnswer": { "@type": "Answer", "text": "No. The file is read by your browser and never sent to a server. There is no upload endpoint in this tool — which matters for client invoice data under a confidentiality clause and under the DPDP Act, where handing a client's return to an unknown website is a problem you own." }
+        },
+        {
+            "@type": "Question",
+            "name": "Can I drop the ZIP downloaded from the GST portal?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Yes. The ZIP is opened in the browser and every JSON inside it is converted. Drop several ZIPs at once to get one workbook for the whole year." }
+        },
+        {
+            "@type": "Question",
+            "name": "Which sections are covered?",
+            "acceptedAnswer": { "@type": "Answer", "text": "B2B, B2BA, B2CL, B2CLA, B2CS, B2CSA, CDNR, CDNRA, CDNUR, EXP, EXPA, HSN, DOC, NIL, AT and ATADJ — each on its own sheet, one row per item, because one invoice can carry several tax rates." }
+        },
+        {
+            "@type": "Question",
+            "name": "Does it replace the GST Offline Tool?",
+            "acceptedAnswer": { "@type": "Answer", "text": "No. The portal accepts only the GSTR-1 JSON that the Offline Tool generates, so keep the tool for filing. This converter goes the other way: it turns a JSON you already have into readable Excel for review, reconciliation and audit." }
+        },
+        {
+            "@type": "Question",
+            "name": "Why is there a Summary sheet?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Because the totals are what you actually check. The Summary is calculated from the rows, not copied from the file: records, taxable value and IGST/CGST/SGST/Cess per section, plus a TOTAL line to compare against the return." }
+        }
+    ]
+}
+    </script>
+</head>
+<body>
+    <header class="header">
+        <div class="container header-inner">
+            <a href="index.html" class="logo">
+                <span class="logo-icon">📋</span>
+                <span class="logo-text">CSV<span class="logo-accent">→</span>JSON</span>
+            </a>
+            <div class="header-badges">
+                <span class="badge badge-free">Free</span>
+                <span class="badge badge-privacy">No Upload</span>
+            </div>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container">
+            <h1>GSTR-1 JSON<br><span class="hero-accent">to Excel</span></h1>
+            <p class="hero-subtitle">Drop the JSON (or the portal ZIP) and get one sheet per section — B2B, B2CL, B2CS, CDNR, EXP, HSN, DOC, NIL — plus a Summary with totals. Everything runs in your browser: a client's return never leaves your machine.</p>
+        </div>
+    </section>
+
+    <div class="container" id="gstr1Tool">
+        <div class="drop-zone" id="dropZone">
+            <input type="file" id="fileInput" accept=".json,.zip,application/json,application/zip" multiple hidden>
+            <div class="drop-zone-content">
+                <div class="drop-zone-icon">🗂</div>
+                <p class="drop-zone-text">Drop GSTR-1 JSON or ZIP here</p>
+                <p class="drop-zone-subtext">.json, .zip · several files merge into one workbook · nothing is uploaded</p>
+            </div>
+        </div>
+
+        <div class="file-list-section" id="fileListSection" style="display:none;">
+            <div class="file-list-header">
+                <span class="file-list-title">Files (<span id="fileCount">0</span>)</span>
+                <button class="btn-text btn-clear" id="clearAllBtn" type="button">Clear all</button>
+            </div>
+            <div class="file-list" id="fileList"></div>
+        </div>
+
+        <div class="status-box" id="statusBox" style="display:none;"></div>
+
+        <div class="output-section" id="outputSection" style="display:none;">
+            <div class="meta-box" id="metaBox" style="display:none;"></div>
+            <div class="summary-wrap">
+                <table class="summary-table" id="summaryTable"></table>
+            </div>
+            <p class="sheets-info" id="sheetsInfo"></p>
+            <div class="output-actions">
+                <button class="btn-primary" id="downloadBtn" type="button">Download Excel (.xlsx)</button>
+            </div>
+        </div>
+    </div>
+
+    <main class="container seo-content">
+        <h2>Why convert GSTR-1 JSON to Excel</h2>
+        <p>The return arrives as a single JSON file with nested arrays. You cannot foot it, filter it, or send it to a client in that shape — and opening it in Notepad tells you nothing. Excel is where accountants actually check a return: sort by GSTIN, sum the taxable value per rate, compare HSN quantities against the sales register.</p>
+
+        <h2>One row per item, not per invoice</h2>
+        <p>A single invoice can carry several tax rates — clothing is the classic case, 5% and 18% under one HSN. Aggregating an invoice into one row loses the rate split, which is exactly what you need during an audit. Every sheet here is item-level: the invoice fields repeat, each item gets its own row, and the rate stays visible.</p>
+
+        <h2>The Summary is calculated, not copied</h2>
+        <p>A GSTR-1 JSON carries no totals, so the tool computes them: records, taxable value and IGST/CGST/SGST/Cess for every section, plus a TOTAL line. Compare it against the return before you file anything downstream. If a section looks wrong, you can see which sheet it came from.</p>
+
+        <h2>Where the file goes (nowhere)</h2>
+        <p>Most online GSTR-1 converters upload the file to their own server. For a client's return that means supplier GSTINs, invoice registers and turnover leave your machine — a confidentiality problem you carry, not the website. This tool has no upload step: parsing, section splitting and the XLSX build all happen in the browser tab. You can even switch the network off after the page loads and it keeps working.</p>
+
+        <h2>What it does not do</h2>
+        <p>It does not generate the JSON that the portal accepts for filing — that file must come from the official GST Offline Tool, because the portal validates its own schema. Use the <a href="csv-to-json-for-gst.html">Excel to JSON for GSTR-1</a> page if your data is in a spreadsheet and your accounting system needs JSON; use this page when you already have the JSON and need it readable.</p>
+    </main>
+
+    <section class="faq-section">
+        <div class="container">
+            <h2 class="section-title-center">Frequently Asked Questions</h2>
+            <div class="faq-list" style="max-width:680px;margin:0 auto;">
+                <details class="faq-item"><summary>Is the client's GSTR-1 data uploaded anywhere?</summary><p>No. There is no upload endpoint in this tool — it reads the file in the tab and builds the workbook locally. You can disconnect the network after the page loads and it still works.</p></details>
+                <details class="faq-item"><summary>Can I drop the ZIP from the GST portal?</summary><p>Yes. The ZIP is unpacked in the browser and every JSON inside is converted. Drop several ZIPs at once and they merge into one workbook — that is how you build a full-year review file.</p></details>
+                <details class="faq-item"><summary>Which sections are covered?</summary><p>B2B, B2BA, B2CL, B2CLA, B2CS, B2CSA, CDNR, CDNRA, CDNUR, EXP, EXPA, HSN, DOC, NIL, AT and ATADJ. Empty sections are skipped instead of leaving blank sheets.</p></details>
+                <details class="faq-item"><summary>Are invoice numbers and HSN codes kept intact?</summary><p>Yes. HSN is written as text on purpose: 0401 stays 0401 and does not become 401. Invoice numbers with leading zeros stay as they are. Dates keep the portal's own DD-MM-YYYY format so nothing is re-interpreted.</p></details>
+                <details class="faq-item"><summary>Does it replace the GST Offline Tool?</summary><p>No. The portal accepts only the JSON that the Offline Tool generates. This converter goes the other direction — JSON you already have becomes readable Excel for review, reconciliation and audit.</p></details>
+                <details class="faq-item"><summary>How large a file can it handle?</summary><p>The limit is your machine's memory, not a server quota. A monthly return for a mid-size client converts instantly; a full year of ZIPs takes a few seconds and produces one workbook.</p></details>
+                <details class="faq-item"><summary>How much does it cost?</summary><p>Nothing. No signup, no limit, no paywall — the tool exists because reading a GSTR-1 JSON is a weekly problem for anyone filing returns.</p></details>
+            </div>
+        </div>
+    </section>
+
+    <section class="features-section">
+        <div class="container">
+            <h2 class="section-title-center">Related Tools</h2>
+            <div class="related-grid">
+                <a href="csv-to-json-for-gst.html" class="related-card"><span class="related-icon">📑</span><span class="related-title">Excel to JSON for GSTR-1</span></a>
+                <a href="csv-to-json.html" class="related-card"><span class="related-icon">📄</span><span class="related-title">CSV to JSON Converter</span></a>
+                <a href="csv-to-json-batch.html" class="related-card"><span class="related-icon">🗂</span><span class="related-title">CSV to JSON Batch Converter</span></a>
+                <a href="csv-to-nested-json.html" class="related-card"><span class="related-icon">🌳</span><span class="related-title">CSV to Nested JSON</span></a>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <p class="footer-text">GSTR-1 JSON→Excel · Browser-Side · Privacy-First · <a href="index.html">Home</a></p>
+        </div>
+    </footer>
+
+    <script src="vendor/jszip.min.js"></script>
+    <script src="vendor/xlsx.full.min.js"></script>
+    <script src="js/gstr1-core.js"></script>
+    <script src="js/metrics.js"></script>
+    <script src="js/gstr1-app.js"></script>
+</body>
+</html>

@@ -6,10 +6,11 @@ console.log('\n[seo-map.test.js] sitemap и canonical');
 const sitemap = read('sitemap.xml');
 const urls = [...sitemap.matchAll(/<loc>(.*?)<\/loc>/g)].map((m) => m[1]);
 
-eq('в sitemap ровно 5 URL', urls.length, 5);
+eq('в sitemap ровно 6 URL', urls.length, 6);
 ok('в sitemap нет слитой страницы convert-csv-to-json',
    !urls.some((u) => u.includes('convert-csv-to-json')), urls.join(', '));
 ok('GST-страница в sitemap есть', urls.some((u) => u.includes('csv-to-json-for-gst')));
+ok('GSTR-1 JSON→Excel в sitemap есть', urls.some((u) => u.endsWith('/gstr1-json-to-excel')));
 ok('главная в sitemap есть', urls.some((u) => u.endsWith('csv-to-json.com/')));
 
 const pages = {
@@ -17,7 +18,8 @@ const pages = {
     'seo/csv-to-json-for-gst.html': 'https://csv-to-json.com/csv-to-json-for-gst',
     'seo/csv-to-json-batch.html': 'https://csv-to-json.com/csv-to-json-batch',
     'seo/csv-to-nested-json.html': 'https://csv-to-json.com/csv-to-nested-json',
-    'seo/convert-csv-to-json.html': 'https://csv-to-json.com/csv-to-json'
+    'seo/convert-csv-to-json.html': 'https://csv-to-json.com/csv-to-json',
+    'seo/gstr1-json-to-excel.html': 'https://csv-to-json.com/gstr1-json-to-excel'
 };
 for (const [file, canonical] of Object.entries(pages)) {
     const src = read(file);

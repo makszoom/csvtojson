@@ -5,7 +5,7 @@
  *
  * Chrome должен быть уже запущен (см. шапку harness.js).
  */
-const { connect, openPage, collectors, dropFile, dropBinary } = require('./harness');
+const { connect, openPage, collectors, dropFile, dropBinary, sleep } = require('./harness');
 const { spawn } = require('child_process');
 const path = require('path');
 const fs = require('fs');
@@ -213,6 +213,95 @@ const CSV = 'invoice_no,hsn,taxable,party\n00721,0401,1500.50,"Ann, Ltd"\n00012,
         p = await openPage(`${BASE}/privacy.html`);
         ok('privacy открывается', (await p.evalJS('document.title')).length > 0);
         ok('ошибок JS на странице без инструмента нет', collectors.exceptions.length === 0, collectors.exceptions.join(' | '));
+        await p.close();
+
+        // ── 5. GSTR-1 JSON -> Excel: инструмент, сводка, скачивание, ошибки ──
+        console.log('\n[gstr1] JSON -> Excel');
+        p = await openPage(`${BASE}/gstr1-json-to-excel.html`);
+        ok('страница GSTR-1 открывается', (await p.evalJS('document.title')).includes('GSTR-1 JSON to Excel'));
+        ok('модуль приложения поднялся', (await p.evalJS('window.__gstr1App && window.__gstr1App.ready')) === true);
+        ok('ядро gstr1-core подключено', (await p.evalJS('typeof window.CSVtoJSONGstr1 === "object"')));
+        ok('SheetJS подключён с нашего домена', (await p.evalJS('typeof window.XLSX !== "undefined"')));
+        ok('JSZip подключён с нашего домена', (await p.evalJS('typeof window.JSZip !== "undefined"')));
+        ok('выходная панель скрыта до файла',
+           (await p.evalJS('getComputedStyle(document.getElementById("outputSection")).display')) === 'none');
+
+        const GSTR1 = {
+            gstin: '27AAPFU0939F1ZV', fp: '032026', version: 'GST3.2.0',
+            b2b: [{ ctin: '27AAACR5055K1Z7', inv: [{ inum: 'INV/001', idt: '01-03-2026', val: 1180,
+                pos: '27', rchrg: 'N', inv_typ: 'R', itms: [
+                    { num: 1, itm_det: { rt: 18, txval: 500, iamt: 90, camt: 0, samt: 0, csamt: 0 } },
+                    { num: 2, itm_det: { rt: 12, txval: 500, iamt: 0, camt: 30, samt: 30, csamt: 0 } }] }] }],
+            b2cs: [{ pos: '27', sply_ty: 'INTER', rt: 18, txval: 1000, iamt: 180 }],
+            hsn: { data: [{ num: 1, hsn_sc: '0401', uqc: 'OTH', qty: 1, txval: 500, iamt: 90 }] },
+            doc_issue: { doc_det: [{ doc_num: 1, docs: [{ num: 1, from: 'INV/001', to: 'INV/050', totnum: 50, cancel: 2, net_issue: 48 }] }] }
+        };
+        const dropG = await dropFile(p.evalJS, { name: 'gstr1-032026.json', text: JSON.stringify(GSTR1) });
+        ok('JSON-файл подан в input', dropG && dropG.ok, JSON.stringify(dropG));
+        await sleep(1500);
+        ok('файл появился в списке', (await p.evalJS('document.querySelectorAll("#fileList .file-item").length')) === 1);
+        ok('выходная панель показана',
+           (await p.evalJS('getComputedStyle(document.getElementById("outputSection")).display')) !== 'none');
+        ok('Summary-таблица отрисована', (await p.evalJS('document.querySelectorAll("#summaryTable tr").length')) > 3);
+        const lastRow = await p.evalJS('(() => { const r = [...document.querySelectorAll("#summaryTable tr")].pop(); return r ? r.textContent : ""; })()');
+        ok('последняя строка сводки — TOTAL', String(lastRow).startsWith('TOTAL'), String(lastRow).slice(0, 80));
+        ok('meta показывает GSTIN файла',
+           (await p.evalJS('document.getElementById("metaBox").textContent')).includes('27AAPFU0939F1ZV'));
+        ok('meta показывает период',
+           (await p.evalJS('document.getElementById("metaBox").textContent')).includes('March 2026'));
+        ok('листы перечислены и HSN среди них',
+           (await p.evalJS('document.getElementById("sheetsInfo").textContent')).includes('HSN'));
+        ok('B2B развернут в 2 строки (по строке на item)',
+           (await p.evalJS('window.__gstr1App.sheets()')) >= 4);
+
+        await send('Page.setDownloadBehavior', { behavior: 'deny' }, p.sessionId).catch(() => {});
+        await p.evalJS('document.getElementById("downloadBtn").click()');
+        await sleep(700);
+        ok('кнопка скачивания отработала без исключения', collectors.exceptions.length === 0, collectors.exceptions.join(' | '));
+        ok('статус после скачивания — успех',
+           (await p.evalJS('document.getElementById("statusBox").className')).includes('ok'));
+
+        // ── 5b. ZIP от портала: несколько JSON -> одна книга ──
+        console.log('\n[gstr1] ZIP с двумя месяцами');
+        const JSZipMod = require('../../vendor/jszip.min.js');
+        const z = new JSZipMod();
+        z.file('gstr1-032026.json', JSON.stringify(GSTR1));
+        z.file('gstr1-042026.json', JSON.stringify(GSTR1));
+        const zipB64 = await z.generateAsync({ type: 'base64' });
+        p = await openPage(`${BASE}/gstr1-json-to-excel.html`);
+        const dropZ = await dropBinary(p.evalJS, { name: 'GSTR1-FY2026.zip', base64: zipB64, mime: 'application/zip' });
+        ok('ZIP подан', dropZ && dropZ.ok, JSON.stringify(dropZ));
+        await sleep(2000);
+        ok('ZIP распознан как один файл', (await p.evalJS('document.querySelectorAll("#fileList .file-item").length')) === 1);
+        ok('внутри ZIP найдено 2 JSON',
+           (await p.evalJS('document.querySelector("#fileList .file-item-size").textContent')).includes('2 JSON'),
+           await p.evalJS('document.querySelector("#fileList .file-item-size").textContent'));
+        const b2bRecs = await p.evalJS(`(() => {
+            const rows = [...document.querySelectorAll('#summaryTable tr')];
+            const hit = rows.find(r => r.children[0] && r.children[0].textContent === 'B2B');
+            return hit ? hit.children[1].textContent : '';
+        })()`);
+        ok('два месяца смёржены: B2B records = 4', b2bRecs === '4', 'получено ' + b2bRecs);
+        ok('Summary пересчитан после merge',
+           (await p.evalJS('document.querySelectorAll("#summaryTable tr").length')) > 3);
+        ok('ошибок JS при ZIP нет', collectors.exceptions.length === 0, collectors.exceptions.join(' | '));
+        await p.close();
+        await p.close();
+
+        // ── 6. Не-GSTR-1 файл: понятная ошибка, а не тихий пустой экран ──
+        console.log('\n[gstr1] чужой JSON');
+        p = await openPage(`${BASE}/gstr1-json-to-excel.html`);
+        await dropFile(p.evalJS, { name: 'wrong.json', text: '{"foo":1,"bar":[2,3]}' });
+        await sleep(1200);
+        const statusText = await p.evalJS('document.getElementById("statusBox").textContent');
+        ok('показана ошибка про формат', /GSTR-1/i.test(statusText), statusText.slice(0, 120));
+        ok('плашка ошибки видима',
+           (await p.evalJS('getComputedStyle(document.getElementById("statusBox")).display')) !== 'none');
+        ok('выходная панель не показана на мусоре',
+           (await p.evalJS('getComputedStyle(document.getElementById("outputSection")).display')) === 'none');
+        ok('битый JSON не убил приложение',
+           (await p.evalJS('window.__gstr1App && window.__gstr1App.ready')) === true);
+        ok('ошибок JS на негативном кейсе нет', collectors.exceptions.length === 0, collectors.exceptions.join(' | '));
         await p.close();
 
     } catch (e) {
