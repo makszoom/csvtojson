@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GSTR-1 Download in Excel — Three Ways, No Upload</title>
+    <meta name="description" content="The portal exports GSTR-1 as JSON, not Excel. Three ways to get it into a spreadsheet — including one that keeps the client's file on your own machine.">
+    <link rel="canonical" href="https://csv-to-json.com/gstr1-download-in-excel">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%93%8A%3C/text%3E%3C/svg%3E">
+    <link rel="stylesheet" href="css/style.css">
+
+    <meta property="og:title" content="GSTR-1 Download in Excel — Three Ways, No Upload">
+    <meta property="og:description" content="The portal gives you JSON. Three routes to a spreadsheet, compared honestly, including one that never uploads the file.">
+    <meta property="og:url" content="https://csv-to-json.com/gstr1-download-in-excel">
+    <meta property="og:type" content="article">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="GSTR-1 Download in Excel — Three Ways, No Upload">
+    <meta name="twitter:description" content="The portal gives you JSON. Three routes to a spreadsheet, compared honestly.">
+
+    <script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+        {
+            "@type": "Question",
+            "name": "Can I download GSTR-1 directly as Excel from the portal?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Not as a single clean workbook. The portal gives you a JSON or a ZIP containing JSON. Some builds of the Offline Tool can export the data back to Excel, but that tool is built for preparing a return, not for reading one, and its export does not lay the sections out the way you would foot them." }
+        },
+        {
+            "@type": "Question",
+            "name": "Which method keeps the client's data off someone else's server?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Only the browser-side converter. Most online GSTR-1 JSON converters upload the file to their own server to do the conversion. For a client's return that means supplier GSTINs, invoice registers and turnover leave your machine — a confidentiality problem you carry, not the website." }
+        },
+        {
+            "@type": "Question",
+            "name": "What about Power Query in Excel?",
+            "acceptedAnswer": { "@type": "Answer", "text": "It works and needs no third party: Data → Get Data → From File → From JSON, then expand the nested columns. It is slow for a full year, needs Office 365 or Excel 2019 and above, and the section structure has to be expanded by hand. Good if you have one client and one month." }
+        }
+    ]
+}
+    </script>
+</head>
+<body>
+    <header class="header">
+        <div class="container header-inner">
+            <a href="index.html" class="logo">
+                <span class="logo-icon">📋</span>
+                <span class="logo-text">CSV<span class="logo-accent">→</span>JSON</span>
+            </a>
+            <div class="header-badges">
+                <span class="badge badge-free">Free</span>
+                <span class="badge badge-privacy">No Upload</span>
+            </div>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container">
+            <h1>GSTR-1 Download<br><span class="hero-accent">in Excel</span></h1>
+            <p class="hero-subtitle">The portal exports JSON, not a spreadsheet. Three ways to turn that file into something you can foot — compared honestly, including the one that never uploads your client's return.</p>
+            <p class="hero-subtitle"><a class="btn-primary" href="gstr1-json-to-excel.html" style="display:inline-block;margin-top:18px;text-decoration:none;">Open the browser-side converter</a></p>
+        </div>
+    </section>
+
+    <main class="container seo-content">
+        <h2>Why there is no "download as Excel" button</h2>
+        <p>GSTR-1 is filed against a schema, and the schema is expressed in JSON. The portal's export therefore gives you a JSON file, or a ZIP that contains one per return period. Excel is not an export option because the portal never needs it — it needs the machine-readable file.</p>
+        <p>So the question is not "where is the button", it is "which tool turns that JSON into a workbook without ruining it". There are three realistic answers.</p>
+
+        <h2>Option 1 — the Offline Tool's own export</h2>
+        <p>Recent builds of the GST Offline Tool can export imported data back to Excel. It works, with two caveats worth knowing before you rely on it:</p>
+        <ul>
+            <li>The tool is built to <em>prepare</em> a return, so the export mirrors its own worksheet layout rather than a review-friendly one. Sections come out the way the template wants them, not the way you would foot them.</li>
+            <li>It is a Windows desktop application, and the same failure modes that stop it generating JSON (duplicate HSN under two rates, macros, running from the ZIP) also apply here.</li>
+        </ul>
+
+        <h2>Option 2 — a browser-side converter</h2>
+        <p>Drop the JSON — or the ZIP straight from the portal — and get one sheet per section with a totals summary. Everything runs in the tab: parsing, section splitting and the XLSX build. You can load the page, disconnect the network, and it keeps working.</p>
+        <p>This matters more than it sounds. Most online GSTR-1 converters do the conversion on their own server. For a client's return that means supplier GSTINs, the full invoice register and turnover leave your machine — and if your engagement letter has a confidentiality clause, that is your problem, not the website's.</p>
+        <p><a href="gstr1-json-to-excel.html">GSTR-1 JSON to Excel</a> — covers B2B, B2CL, B2CS, CDNR, CDNUR, EXP, HSN, DOC, NIL, AT and the amendments, one row per item because a single invoice can carry two rates under one HSN.</p>
+
+        <h2>Option 3 — Power Query inside Excel</h2>
+        <p>No third party involved: <em>Data → Get Data → From File → From JSON</em>, then expand the nested columns one by one. Free, and it keeps everything local.</p>
+        <p>The cost is time. Expanding a full year of returns by hand takes far longer than importing one file, it needs Office 365 or Excel 2019 and above, and every section has its own nesting to expand. Fine for one client and one month; painful for a practice.</p>
+
+        <h2>Which one to use</h2>
+        <table class="seo-table">
+            <thead>
+                <tr><th></th><th>Offline Tool export</th><th>Browser converter</th><th>Power Query</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>Takes the portal ZIP directly</td><td>After import</td><td>Yes</td><td>No — one file at a time</td></tr>
+                <tr><td>File leaves your machine</td><td>No</td><td>No</td><td>No</td></tr>
+                <tr><td>One sheet per section</td><td>Template layout</td><td>Yes</td><td>Manual expansion</td></tr>
+                <tr><td>Totals you can check</td><td>No</td><td>Yes, computed from rows</td><td>Build them yourself</td></tr>
+                <tr><td>Install required</td><td>Windows app</td><td>None</td><td>Office 365 / 2019+</td></tr>
+                <tr><td>Several months at once</td><td>One at a time</td><td>Drop them together, merged</td><td>One at a time</td></tr>
+            </tbody>
+        </table>
+
+        <h2>What the workbook looks like</h2>
+        <p>One sheet per section, named after the section — B2B, B2CL, B2CS, CDNR, EXP, HSN, DOC, NIL. Empty sections are skipped instead of leaving blank sheets. A <strong>Summary</strong> sheet sits first with records, taxable value and IGST/CGST/SGST/Cess per section plus a TOTAL line, computed from the rows rather than copied from the file.</p>
+        <p>HSN codes stay text on purpose: <code>0401</code> does not become <code>401</code>. Invoice numbers keep their leading zeros. Dates keep the portal's own <code>DD-MM-YYYY</code> format so nothing is re-interpreted on the way in.</p>
+    </main>
+
+    <section class="faq-section">
+        <div class="container">
+            <h2 class="section-title-center">Frequently Asked Questions</h2>
+            <div class="faq-list" style="max-width:680px;margin:0 auto;">
+                <details class="faq-item"><summary>Can I download GSTR-1 directly as Excel from the portal?</summary><p>Not as a single clean workbook. The portal gives you a JSON or a ZIP containing JSON. Some builds of the Offline Tool can export back to Excel, but that tool is built for preparing a return, not reading one, and its export follows its own template layout.</p></details>
+                <details class="faq-item"><summary>Which method keeps the client's data off someone else's server?</summary><p>Only the browser-side converter and Power Query. Most online GSTR-1 converters upload the file to their own server. For a client's return that means supplier GSTINs, invoice registers and turnover leave your machine.</p></details>
+                <details class="faq-item"><summary>What about Power Query in Excel?</summary><p>It works and needs no third party: Data → Get Data → From File → From JSON, then expand the nested columns. Slow for a full year, needs Office 365 or Excel 2019+, and sections must be expanded by hand.</p></details>
+                <details class="faq-item"><summary>Does it handle the amendments sections?</summary><p>Yes — B2BA, CDNRA, EXPA and B2CSA each get their own sheet, with the original invoice or note reference alongside the amended values, so you can see what changed rather than just the new figure.</p></details>
+                <details class="faq-item"><summary>Is it free?</summary><p>Yes. No signup, no limit, no paywall on this tool.</p></details>
+            </div>
+        </div>
+    </section>
+
+    <section class="features-section">
+        <div class="container">
+            <h2 class="section-title-center">Related Tools</h2>
+            <div class="related-grid">
+                <a href="gstr1-json-to-excel.html" class="related-card"><span class="related-icon">📑</span><span class="related-title">GSTR-1 JSON to Excel</span></a>
+                <a href="how-to-convert-excel-to-json-for-gst.html" class="related-card"><span class="related-icon">📄</span><span class="related-title">Excel to JSON for GST</span></a>
+                <a href="gst-offline-tool-json-not-generating.html" class="related-card"><span class="related-icon">🔧</span><span class="related-title">Offline Tool Not Generating JSON</span></a>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <p class="footer-text">GSTR-1 download to Excel · Browser-Side · No Upload · <a href="index.html">Home</a></p>
+        </div>
+    </footer>
+</body>
+</html>

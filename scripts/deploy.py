@@ -30,6 +30,9 @@ MAP_EXTRA = {
     "seo/csv-to-json-batch.html": "csv-to-json-batch.html",
     "seo/csv-to-nested-json.html": "csv-to-nested-json.html",
     "seo/gstr1-json-to-excel.html": "gstr1-json-to-excel.html",
+    "seo/gst-offline-tool-json-not-generating.html": "gst-offline-tool-json-not-generating.html",
+    "seo/how-to-convert-excel-to-json-for-gst.html": "how-to-convert-excel-to-json-for-gst.html",
+    "seo/gstr1-download-in-excel.html": "gstr1-download-in-excel.html",
 }
 
 # что НЕ деплоим никогда

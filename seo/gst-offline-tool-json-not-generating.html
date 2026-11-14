@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GST Offline Tool Not Generating JSON — 8 Causes, Fixed</title>
+    <meta name="description" content="Utility hangs on Generate File or says the file was not created? Work through the eight real causes — duplicate HSN under two rates, cache, macros, date format. Free checklist.">
+    <link rel="canonical" href="https://csv-to-json.com/gst-offline-tool-json-not-generating">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%94%A7%3C/text%3E%3C/svg%3E">
+    <link rel="stylesheet" href="css/style.css">
+
+    <meta property="og:title" content="GST Offline Tool Not Generating JSON — 8 Causes, Fixed">
+    <meta property="og:description" content="Eight real causes why the GST offline utility hangs on Generate File, in the order worth checking. From the threads where accountants hit this monthly.">
+    <meta property="og:url" content="https://csv-to-json.com/gst-offline-tool-json-not-generating">
+    <meta property="og:type" content="article">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="GST Offline Tool Not Generating JSON — 8 Causes, Fixed">
+    <meta name="twitter:description" content="Why the GST offline utility hangs on Generate File, in the order worth checking.">
+
+    <script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    "name": "Fix GST offline tool not generating JSON",
+    "description": "Work through the eight known causes why the GST returns offline utility fails to generate a JSON file, in order from most to least common.",
+    "totalTime": "PT15M",
+    "step": [
+        { "@type": "HowToStep", "position": 1, "name": "Check HSN duplicates", "text": "If the same HSN code appears under two GST rates (for example 5% and 18% on clothing), the generator hangs instead of raising an error. Split the code by rate in the Excel itself: 6109_5 and 6109_18." },
+        { "@type": "HowToStep", "position": 2, "name": "Extract the utility first", "text": "Running the utility from inside the downloaded ZIP folder fails silently: it cannot write to that path. Extract to a local folder such as C:\\GST before running." },
+        { "@type": "HowToStep", "position": 3, "name": "Enable macros", "text": "The validation step runs as an Excel macro. If macro security blocks it, the sheet never reaches Validation Successful and Generate File does nothing." },
+        { "@type": "HowToStep", "position": 4, "name": "Clear the cache between attempts", "text": "A stuck partial run is cached, and every retry inherits it. Clear the utility cache folder before trying again." }
+    ]
+}
+    </script>
+
+    <script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+        {
+            "@type": "Question",
+            "name": "Why does Generate File hang and never finish?",
+            "acceptedAnswer": { "@type": "Answer", "text": "In versions 3.2.3 and 3.2.4 the most common cause is one HSN code carrying two GST rates. The utility keys the HSN summary on the code alone, so the second row collides with the first and the generator waits forever instead of raising a validation error. Split the code by rate in the workbook and import section-wise." }
+        },
+        {
+            "@type": "Question",
+            "name": "Is waiting and retrying a real fix?",
+            "acceptedAnswer": { "@type": "Answer", "text": "No. People report it working after 15-20 minutes, but that is the utility occasionally clearing its own stuck state — the same failure returns next month. Fix the cause instead, or file the return in online mode." }
+        },
+        {
+            "@type": "Question",
+            "name": "The JSON was generated but the portal says the file could not be uploaded",
+            "acceptedAnswer": { "@type": "Answer", "text": "That message is about the schema version, not the data. A JSON written by an older utility cannot be accepted by a portal expecting the current version. Do not hand-edit the version string: regenerate in the current utility, or the file will fail deeper in processing." }
+        },
+        {
+            "@type": "Question",
+            "name": "What if the utility still will not generate the file?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Filing GSTR-1 in online mode on the portal is the dependable workaround: it accepts invoice details natively and needs no JSON upload. Slower for large volumes, but it cannot fail on schema." }
+        }
+    ]
+}
+    </script>
+</head>
+<body>
+    <header class="header">
+        <div class="container header-inner">
+            <a href="index.html" class="logo">
+                <span class="logo-icon">📋</span>
+                <span class="logo-text">CSV<span class="logo-accent">→</span>JSON</span>
+            </a>
+            <div class="header-badges">
+                <span class="badge badge-free">Free</span>
+                <span class="badge badge-privacy">No Upload</span>
+            </div>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container">
+            <h1>GST Offline Tool<br><span class="hero-accent">Not Generating JSON</span></h1>
+            <p class="hero-subtitle">Eight causes, in the order worth checking — written from the accountant threads where this hits every filing month. Start at the top: the first one accounts for most cases.</p>
+        </div>
+    </section>
+
+    <main class="container seo-content">
+        <h2>The short version</h2>
+        <p>If the utility sits on <strong>Generate File</strong> and never finishes, the cause is almost never the portal and almost never your data being wrong. It is the utility colliding with itself. The first check below fixes most cases in about five minutes; the rest are ordered by how often they turn out to be it.</p>
+
+        <h2>1. One HSN code under two GST rates</h2>
+        <p>This is the big one, and it explains why the failure looks random. The utility keys the HSN summary table on the code alone. When the same code appears twice under different rates — clothing is the classic case, 5% and 18% under one HSN — the second row collides with the first, and instead of raising a validation error the generator waits.</p>
+        <p><strong>Fix:</strong> split the code by rate in the Excel workbook itself, not inside the utility: <code>6109_5</code> and <code>6109_18</code>. Then import section-wise — B2B first, then B2CS, then HSN as its own file. A single large workbook is what triggers the hang.</p>
+
+        <h2>2. Running the utility from inside the ZIP</h2>
+        <p>Double-clicking the utility inside the downloaded archive is the second most common cause. It cannot write its temporary files to a read-only path, and it fails silently — the window opens, the buttons work, Generate File does nothing.</p>
+        <p><strong>Fix:</strong> extract the whole folder somewhere like <code>C:\GST\</code> and run it from there. Every time you update the utility, extract again rather than running it in place.</p>
+
+        <h2>3. Excel macros are blocked</h2>
+        <p>Validation runs as an Excel macro. If macro security blocks it, the sheet never reaches <em>Validation Successful</em> and Generate File has nothing to write. The error is not shown anywhere useful — the row error points at a cell, not at the macro that never ran.</p>
+        <p><strong>Fix:</strong> Excel → Trust Center → Macro Settings → enable macros, and unblock the file before opening it if Windows marked it as downloaded from the internet.</p>
+
+        <h2>4. Dates are not in DD-MMM-YYYY</h2>
+        <p>The template accepts <code>01-Mar-2026</code>. It does not accept <code>01/03/2026</code>, and the error highlights the row, not the column — so it reads like a data problem rather than a formatting one.</p>
+
+        <h2>5. Blank rows that still carry formatting</h2>
+        <p>The utility counts formatted-but-empty cells as records. A single empty row below the last invoice, with formatting still attached, is enough to fail the sheet.</p>
+        <p><strong>Fix:</strong> select everything below your last record and delete the rows, not just clear the contents.</p>
+
+        <h2>6. A stuck run is cached</h2>
+        <p>Once a run fails partway, the partial state is cached and every retry inherits it. This is why "close it and try again" sometimes appears to work and then fails again later.</p>
+        <p><strong>Fix:</strong> clear the utility cache folder between attempts — it sits under <code>%LOCALAPPDATA%\GSTN</code> on current builds, or the <code>GSTR1_JSON</code> folder next to the executable on older ones.</p>
+
+        <h2>7. The file is simply too large for one pass</h2>
+        <p>Large returns fail more often than small ones even with perfect data. Import and generate section by section, or split by invoice range, then merge.</p>
+
+        <h2>8. OLE error when generating GSTR-9C</h2>
+        <p>A different failure with a different cause: the 9C utility writes to the registry through OLE and a non-elevated Excel cannot. Run <strong>both</strong> the Excel utility and the DSC signer as Administrator, and close every other Excel window first — an open workbook holds the OLE registration and the utility silently fails to attach.</p>
+
+        <h2>When to stop fixing and file online</h2>
+        <p>If all eight checks pass and the file still will not generate, filing GSTR-1 in online mode on the portal is the dependable route: it accepts invoice details natively and needs no JSON upload at all. It is slower for large volumes, but it cannot fail on schema.</p>
+        <p>Waiting fifteen or twenty minutes and pressing the button again is not a fix. It is the utility occasionally clearing its own stuck state — and the same failure will be there next month.</p>
+
+        <h2>If you already have a JSON and cannot read it</h2>
+        <p>A different problem with the same origin: the portal gives you a JSON and you need to foot it against the sales register. That file is one line of nested arrays, so open it as a workbook first — <a href="gstr1-json-to-excel.html">GSTR-1 JSON to Excel</a> turns every section into its own sheet with a totals summary, entirely in your browser.</p>
+    </main>
+
+    <section class="faq-section">
+        <div class="container">
+            <h2 class="section-title-center">Frequently Asked Questions</h2>
+            <div class="faq-list" style="max-width:680px;margin:0 auto;">
+                <details class="faq-item"><summary>Why does Generate File hang and never finish?</summary><p>In versions 3.2.3 and 3.2.4 the most common cause is one HSN code carrying two GST rates. The utility keys the HSN summary on the code alone, so the second row collides with the first and the generator waits forever instead of raising a validation error. Split the code by rate in the workbook and import section-wise.</p></details>
+                <details class="faq-item"><summary>Is waiting and retrying a real fix?</summary><p>No. People report it working after 15–20 minutes, but that is the utility occasionally clearing its own stuck state — the same failure returns next month. Fix the cause, or file the return in online mode.</p></details>
+                <details class="faq-item"><summary>The JSON was generated but the portal says the file could not be uploaded</summary><p>That message is about the schema version, not the data. A JSON written by an older utility cannot be accepted by a portal expecting the current version. Do not hand-edit the version string — regenerate in the current utility, or the file will fail deeper in processing after the return period has started.</p></details>
+                <details class="faq-item"><summary>Do I need to reinstall the utility?</summary><p>Rarely. Reinstalling clears the cache as a side effect, which is why it appears to help — the same effect is available from check 6 without losing your work. If a reinstall fixes it and the problem returns next month, you fixed the cache, not the cause.</p></details>
+                <details class="faq-item"><summary>What if none of the eight checks work?</summary><p>File GSTR-1 in online mode on the portal: it accepts invoice details natively and needs no JSON upload. Slower for large volumes, but it cannot fail on schema.</p></details>
+            </div>
+        </div>
+    </section>
+
+    <section class="features-section">
+        <div class="container">
+            <h2 class="section-title-center">Related Tools</h2>
+            <div class="related-grid">
+                <a href="gstr1-json-to-excel.html" class="related-card"><span class="related-icon">📑</span><span class="related-title">GSTR-1 JSON to Excel</span></a>
+                <a href="csv-to-json-for-gst.html" class="related-card"><span class="related-icon">📄</span><span class="related-title">Excel to JSON for GSTR-1</span></a>
+                <a href="csv-to-json.html" class="related-card"><span class="related-icon">🗂</span><span class="related-title">CSV to JSON Converter</span></a>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <p class="footer-text">GST Offline Tool Troubleshooting · Browser-Side Tools · <a href="index.html">Home</a></p>
+        </div>
+    </footer>
+</body>
+</html>

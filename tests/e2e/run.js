@@ -308,6 +308,38 @@ const CSV = 'invoice_no,hsn,taxable,party\n00721,0401,1500.50,"Ann, Ltd"\n00012,
         ok('ошибок JS на негативном кейсе нет', collectors.exceptions.length === 0, collectors.exceptions.join(' | '));
         await p.close();
 
+        // ── 7. Новые страницы кластера 8–20 и инструмент на how-to ──
+        console.log('\n[pages] новые лендинги');
+        p = await openPage(U('/gst-offline-tool-json-not-generating.html'));
+        ok('offline-tool страница открывается', (await p.evalJS('document.title')).includes('Offline Tool Not Generating'));
+        ok('на ней 8 причин в тексте', (await p.evalJS('document.body.innerText')).includes('One HSN code under two GST rates'));
+        ok('нет JS-ошибок на странице диагностики', collectors.exceptions.length === 0, collectors.exceptions.join(' | '));
+        await p.close();
+
+        p = await openPage(U('/gstr1-download-in-excel.html'));
+        ok('download-in-excel открывается', (await p.evalJS('document.title')).includes('GSTR-1 Download'));
+        ok('CTA ведёт на конвертер', (await p.evalJS(`!!document.querySelector('a[href="gstr1-json-to-excel.html"]')`)) === true);
+        ok('таблица сравнения отрисована', (await p.evalJS('document.querySelectorAll(".seo-table tbody tr").length')) >= 5);
+        await p.close();
+
+        p = await openPage(U('/how-to-convert-excel-to-json-for-gst.html'));
+        ok('how-to страница открывается', (await p.evalJS('document.title')).includes('How to Convert Excel'));
+        ok('инструмент смонтирован на лендинге',
+           (await p.evalJS('document.getElementById("toolMount").getAttribute("data-mounted")')) === '1');
+        ok('drop-зона внутри инструмента есть', (await p.evalJS('!!document.querySelector("#toolMount #dropZone")')) === true);
+        const dropH = await dropFile(p.evalJS, { name: 'gst.csv', text: 'invoice_no,hsn,taxable\n00721,0401,1500' }, 'fileInput');
+        ok('файл принят на how-to странице', dropH && dropH.ok, JSON.stringify(dropH));
+        await sleep(1500);
+        ok('превью появилось после загрузки',
+           (await p.evalJS('document.querySelectorAll("#previewTable tbody tr").length')) > 0);
+        await p.evalJS('document.getElementById("convertBtn").click()');
+        await sleep(800);
+        const hOut = await p.evalJS('document.getElementById("jsonOutput").textContent');
+        ok('конвертация на how-to работает', hOut.length > 20, hOut.slice(0, 100));
+        ok('ведущий ноль HSN сохранён', hOut.includes('0401'));
+        ok('нет JS-ошибок на how-to', collectors.exceptions.length === 0, collectors.exceptions.join(' | '));
+        await p.close();
+
     } catch (e) {
         failed++;
         failures.push('исключение раннера');
