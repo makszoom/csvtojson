@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How to Convert Excel to JSON for GST — Step by Step</title>
+    <meta name="description" content="Save the sheet as CSV, drop it in, download JSON — three steps, in your browser, nothing uploaded. Honest caveat: the portal's own upload needs the JSON its Offline Tool writes, not this file.">
+    <link rel="canonical" href="https://csv-to-json.com/how-to-convert-excel-to-json-for-gst">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%93%84%3C/text%3E%3C/svg%3E">
+    <link rel="stylesheet" href="css/style.css">
+
+    <meta property="og:title" content="How to Convert Excel to JSON for GST — Step by Step">
+    <meta property="og:description" content="Three steps from a GST spreadsheet to JSON, in the browser, nothing uploaded. Plus what the portal actually accepts and what it does not.">
+    <meta property="og:url" content="https://csv-to-json.com/how-to-convert-excel-to-json-for-gst">
+    <meta property="og:type" content="article">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="How to Convert Excel to JSON for GST — Step by Step">
+    <meta name="twitter:description" content="Three steps from a GST spreadsheet to JSON, in the browser, nothing uploaded.">
+
+    <script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    "name": "How to convert Excel to JSON for GST",
+    "description": "Turn a GST spreadsheet into JSON in three steps, entirely in the browser, then use it for your ERP, API or review.",
+    "totalTime": "PT2M",
+    "step": [
+        { "@type": "HowToStep", "position": 1, "name": "Prepare the sheet", "text": "Keep one header row, one section per sheet (B2B, B2CL, B2CS, CDNR) and invoice numbers, HSN and GSTIN as text so leading zeros survive." },
+        { "@type": "HowToStep", "position": 2, "name": "Drop the file", "text": "Drop the .xlsx workbook straight in — no need to save it as CSV first. The converter reads the book in the browser and lets you pick the sheet." },
+        { "@type": "HowToStep", "position": 3, "name": "Check and download", "text": "Check the preview, set column types if a code must stay text, then download JSON or copy it." }
+    ]
+}
+    </script>
+
+    <script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+        {
+            "@type": "Question",
+            "name": "Will the GST portal accept this JSON?",
+            "acceptedAnswer": { "@type": "Answer", "text": "No. The portal accepts only the GSTR-1 JSON that its own Offline Tool generates, because it validates that file against its own schema. This converter produces general JSON for your ERP, API, reconciliation or review. Keep the Offline Tool for the upload itself." }
+        },
+        {
+            "@type": "Question",
+            "name": "Do I have to save my Excel as CSV first?",
+            "acceptedAnswer": { "@type": "Answer", "text": "No. Drop the .xlsx workbook directly. If the book has several sheets the converter shows a sheet picker and picks the one that looks like a data table, not the title sheet." }
+        },
+        {
+            "@type": "Question",
+            "name": "Why do invoice numbers lose their leading zeros?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Because spreadsheet software stores 00721 as the number 721 before any converter sees it. Keep the column as Text in Excel first, or set the column type to string in the converter. The same applies to HSN codes and pincodes." }
+        }
+    ]
+}
+    </script>
+</head>
+<body>
+    <header class="header">
+        <div class="container header-inner">
+            <a href="index.html" class="logo">
+                <span class="logo-icon">📋</span>
+                <span class="logo-text">CSV<span class="logo-accent">→</span>JSON</span>
+            </a>
+            <div class="header-badges">
+                <span class="badge badge-free">Free</span>
+                <span class="badge badge-privacy">No Upload</span>
+            </div>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container">
+            <h1>How to Convert Excel<br><span class="hero-accent">to JSON for GST</span></h1>
+            <p class="hero-subtitle">Three steps, and a clear statement of what you get at the end: clean JSON for your ERP, API or review — not the file the portal accepts for filing. That file comes from the Offline Tool, and no converter changes that.</p>
+        </div>
+    </section>
+
+    <div id="toolMount" data-variant="gst"></div>
+
+    <main class="container seo-content">
+        <h2>Step 1 — prepare the sheet</h2>
+        <p>Three things make the difference between JSON you can use and JSON you have to fix by hand:</p>
+        <ul>
+            <li><strong>One header row.</strong> No merged cells, no title row above it. If the export came from Tally with a cover sheet, keep the data on its own sheet.</li>
+            <li><strong>One section per sheet.</strong> B2B, B2CL, B2CS and CDNR have different columns — mixing them in one sheet gives you rows where half the fields are empty.</li>
+            <li><strong>Identifiers as text.</strong> Invoice numbers, HSN codes and pincodes with leading zeros must be Text in Excel before conversion. Otherwise <code>00721</code> becomes <code>721</code> and <code>0401</code> becomes <code>401</code>.</li>
+        </ul>
+
+        <h2>Step 2 — drop the workbook</h2>
+        <p>Drag the <code>.xlsx</code> file into the box above. There is no "Save as CSV" step: the converter reads the workbook directly in your browser, shows a sheet picker when the book has more than one sheet, and opens on the sheet that looks like a data table rather than the title page.</p>
+        <p>Nothing is uploaded. The file is read by JavaScript in the page — you can disconnect the network after loading and the conversion still works.</p>
+
+        <h2>Step 3 — check the preview, then download</h2>
+        <p>The preview shows the JSON as it will be written. This is where you catch the two things that go wrong most often: a column that should be text but became numbers, and an empty column from a trailing formatted row. Fix the column type in the settings, then download or copy.</p>
+
+        <h2>What you get — and what you do not</h2>
+        <table class="seo-table">
+            <thead>
+                <tr><th>Use case</th><th>This converter</th><th>GST Offline Tool</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>Upload GSTR-1 on the portal</td><td>No — the portal validates its own schema</td><td>Yes, this is its only job</td></tr>
+                <tr><td>Push invoices into your ERP or API</td><td>Yes</td><td>No</td></tr>
+                <tr><td>Reconcile against the sales register</td><td>Yes</td><td>No</td></tr>
+                <tr><td>Read a JSON the client already sent</td><td>Yes, and this is the fastest path</td><td>No</td></tr>
+                <tr><td>Works without installing anything</td><td>Yes, in the browser</td><td>No, Windows desktop app</td></tr>
+            </tbody>
+        </table>
+        <p>The row that matters is the first one. Plenty of pages promise "JSON for the GST portal" and quietly mean something else; this page says it plainly so you do not find out at upload time.</p>
+
+        <h2>If you have the JSON and need it readable instead</h2>
+        <p>The opposite direction is a different problem: the portal gives you a JSON and you need it as a spreadsheet to foot it. Use <a href="gstr1-json-to-excel.html">GSTR-1 JSON to Excel</a> — it splits every section onto its own sheet with a totals summary, also in the browser.</p>
+
+        <h2>If the Offline Tool will not generate a file at all</h2>
+        <p>That is a separate failure with known causes — duplicate HSN under two rates, running from inside the ZIP, blocked macros. Written up in <a href="gst-offline-tool-json-not-generating.html">GST Offline Tool not generating JSON</a>.</p>
+    </main>
+
+    <section class="faq-section">
+        <div class="container">
+            <h2 class="section-title-center">Frequently Asked Questions</h2>
+            <div class="faq-list" style="max-width:680px;margin:0 auto;">
+                <details class="faq-item"><summary>Will the GST portal accept this JSON?</summary><p>No. The portal accepts only the GSTR-1 JSON that its own Offline Tool generates, because it validates that file against its own schema. This converter produces general JSON for your ERP, API, reconciliation or review. Keep the Offline Tool for the upload itself.</p></details>
+                <details class="faq-item"><summary>Do I have to save my Excel as CSV first?</summary><p>No. Drop the .xlsx workbook directly. If the book has several sheets the converter shows a sheet picker and opens on the one that looks like a data table, not the title sheet.</p></details>
+                <details class="faq-item"><summary>Why do invoice numbers lose their leading zeros?</summary><p>Because spreadsheet software stores 00721 as the number 721 before any converter sees it. Keep the column as Text in Excel first, or set the column type to string in the converter. The same applies to HSN codes and pincodes.</p></details>
+                <details class="faq-item"><summary>Can I convert several months at once?</summary><p>Yes. Drop several files together and either download each JSON separately or merge them into one array. Each batch counts as one conversion against the free limit.</p></details>
+                <details class="faq-item"><summary>Is my client's data uploaded anywhere?</summary><p>No. Parsing, type casting and JSON generation all run in the page. There is no upload step, and the only network request is an anonymous page counter that carries no file data.</p></details>
+            </div>
+        </div>
+    </section>
+
+    <section class="features-section">
+        <div class="container">
+            <h2 class="section-title-center">Related Tools</h2>
+            <div class="related-grid">
+                <a href="gstr1-json-to-excel.html" class="related-card"><span class="related-icon">📑</span><span class="related-title">GSTR-1 JSON to Excel</span></a>
+                <a href="gst-offline-tool-json-not-generating.html" class="related-card"><span class="related-icon">🔧</span><span class="related-title">Offline Tool Not Generating JSON</span></a>
+                <a href="csv-to-json-for-gst.html" class="related-card"><span class="related-icon">📄</span><span class="related-title">Excel to JSON for GSTR-1</span></a>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <p class="footer-text">Excel to JSON for GST · Browser-Side · No Upload · <a href="index.html">Home</a></p>
+        </div>
+    </footer>
+
+    <script src="js/tool-markup.js"></script>
+    <script src="js/tool-embed.js"></script>
+</body>
+</html>
