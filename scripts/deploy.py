@@ -33,11 +33,13 @@ MAP_EXTRA = {
     "seo/gst-offline-tool-json-not-generating.html": "gst-offline-tool-json-not-generating.html",
     "seo/how-to-convert-excel-to-json-for-gst.html": "how-to-convert-excel-to-json-for-gst.html",
     "seo/gstr1-download-in-excel.html": "gstr1-download-in-excel.html",
+    "seo/best-csv-to-json-converters.html": "best-csv-to-json-converters.html",
 }
 
 # что НЕ деплоим никогда
 SKIP_PREFIX = ("tests/", "node_modules/", ".e2e-site/", "docs/", "backup", ".env", "package",
-               "scripts/", ".gitignore", "README", "workers/", "PLAN", "AUDIT", "CHANGELOG", "SKILL")
+               "scripts/", ".gitignore", "README", "workers/", "PLAN", "AUDIT", "CHANGELOG", "SKILL",
+               "STATUS", "ROADMAP", "NOTES")
 
 
 def env_token():

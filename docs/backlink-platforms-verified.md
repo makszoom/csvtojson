@@ -38,11 +38,31 @@
 | alternativeto.net · theresanaiforthat.com · toolify.ai | **403** для ботов; существуют, но автоматическую подачу не примут — только руками через браузер |
 | bestofai.io · futurepedia.io · free-for.dev · launchboard.dev · launchstag.com · forwardfuture.com · topstartupideas.com | нет ссылки на форму подачи с главной (у free-for.dev подача через GitHub PR — отдельный путь) |
 
+## ВАЖНО: GitHub-списки не дают ссылочного веса
+
+Проверено на живом HTML GitHub 14.11.2026: ссылки в README отдаются с **`rel="nofollow"`**. Обе ссылки-аналога в `awesome-json` (`alef.website`, `konklone.io`) — nofollow.
+
+Что это значит: PR в awesome-списки дают упоминание бренда, редкий реферальный трафик и краулинговый сигнал, но **не передают PageRank**. Планировать канал как «бэклинки» нельзя. Реальные ссылки — только у dofollow-площадок из таблицы ниже.
+
+## Состояние подачи на 14.11.2026
+
+| Канал | Статус |
+|---|---|
+| **`secretGeek/AwesomeCSV`** (959★) | PR [#183](https://github.com/secretGeek/AwesomeCSV/pull/183) — open, `+1 −0` в двух файлах (README + `awesomecsv.csv`, второй является источником) |
+| **`burningtree/awesome-json`** (1577★) | PR [#380](https://github.com/burningtree/awesome-json/pull/380) — open, `+1 −0`. В их CONTRIBUTING правило «не упоминать JSON в описании» — соблюдено |
+| **`iAnonymous3000/awesome-privacy-tools`** (70★) | ❌ **мёртв**: последний коммит 2024-11-19, 33 открытых PR висят месяцами (включая #43 «Add AI convertly» с августа) |
+| **`ripienaar/free-for-dev`** (142k★, коммит вчера) | ❌ **запрещено правилами**: «Generic developer "toolbox" sites - format converters, calculators etc, we have too many already». Плюс «we do not accept AI generated edits… we will close it without discussion» |
+| **`zearches.com`** (79% dofollow) | 🟡 форма разобрана полностью, но площадка троттлит по частоте попыток. Готов скрипт `scripts/submit-zearches.py` — запускать не чаще раза в сутки |
+| `thesaasdir.com` (100%), `tinytooltown.com`, `indietools.app` (87%) | ⏸ нужен email/логин Макса |
+
+**Правило, вынесенное из этой работы:** перед PR проверять три вещи — дату последнего коммита, мержатся ли PR за последние месяцы, и нет ли в CONTRIBUTING запрета на тип продукта. Иначе работа уходит в пустоту.
+
 ## Что делать дальше
 
-1. **zearches.com** — единственная, где подача без аккаунта (только email в форме). Проходится целиком, первый кандидат.
-2. **thesaasdir.com, tinytooltown.com, indietools.app** — нужен email или логин. Подать с аккаунта Макса по готовому пакету ниже.
-3. **GitHub PR в awesome-списки** (awesome-json, awesome-privacy-devtools, free-for.dev) — без аккаунтов площадок, только GitHub-токен из `.env`. Единственный канал, который закрывается полностью без участия Макса.
+1. **zearches.com** — подача без аккаунта, 79% dofollow. `python scripts/submit-zearches.py` (есть `--dry-run`), один раз в сутки. Скрипт сам проверяет длины полей (на `differentiator` лимит 280 символов — на нём была ошибка), подставляет свежие CSRF-токены и ждёт 12 секунд.
+2. **thesaasdir.com, tinytooltown.com, indietools.app** — нужен email или логин. Пакет заявки ниже готов, скриншоты снимаются через E2E-харнесс.
+3. **GitHub PR** — два висят, ответа нет. Проверить через неделю; при отказе не спорить, а искать список с разделом, где конвертеры уместны.
+
 
 ## Пакет заявки (общий, под все площадки)
 
