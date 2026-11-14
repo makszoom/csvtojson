@@ -132,3 +132,29 @@
 **Пойман баг при вставке E2E-блока:** heredoc съел escape `
 ` в двух местах — `console.log('
 [pages]…')` и CSV-фикстура получили реальный перевод строки, `node --check` упал на SyntaxError. Урок: после вставки кода через python-heredoc прогонять `node --check` ДО запуска тестов.
+
+## 2026-11-14 — Работа E: проверка 43 площадок для бэклинков
+
+Проверка вручную скриптом вместо субагента (тот сжёг 18 минут и не выдал результата). Результат в `docs/backlink-platforms-verified.md`.
+
+**Из 33 проверенных доменов:**
+- **22** с живой формой подачи (HTTP 200)
+- **3** отдают 403 для ботов: alternativeto.net, theresanaiforthat.com, toolify.ai — существуют, но авто-подача не пройдёт
+- **1** мёртв: toolhublibrary.com → 404
+- **6** без формы подачи на главной: bestofai.io, futurepedia.io, free-for.dev, launchboard.dev, launchstag.com, forwardfuture.com, topstartupideas.com
+
+**Dofollow-проверка (ключевое — «бесплатно» часто значит nofollow):**
+| Площадка | Доля dofollow-ссылок |
+|---|---|
+| thesaasdir.com | 48 из 48 (100%) |
+| indietools.app | 28 из 32 (87%) |
+| zearches.com | 22 из 28 (79%) |
+| tinytooltown.com | 1 из 1 (мало данных) |
+| saashub.com | 9 из 25 (36%) |
+| tinystartups.com | 34 из 70 (49%) |
+
+**Что требует подача:** thesaasdir и zearches — только email (у zearches прямо написано «No Account Needed»), indietools — логин, tinytooltown — только картинки.
+
+**Пакет заявки готов** (название, описания на 60 и 160 символов, категории, теги, отличия для модератора) — в том же файле, переиспользуется под все площадки.
+
+**Следующее по каналу:** GitHub PR в awesome-списки — единственный путь без чужих аккаунтов, токен уже в `.env`.
