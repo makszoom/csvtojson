@@ -25,27 +25,27 @@
 {
     "@context": "https://schema.org",
     "@type": "HowTo",
-    "name": "How to csv to json for gst",
+    "name": "How to convert a GSTR-1 Excel or CSV file to JSON in the browser",
     "description": "GSTR-1 Excel or CSV to JSON right in your browser — no upload, no signup, the file stays local. Free 5 files, then $5. Not portal-schema JSON (that needs the Offline Tool).",
     "totalTime": "PT1M",
     "step": [
         {
             "@type": "HowToStep",
             "position": 1,
-            "name": "Upload CSV",
-            "text": "Drag and drop your CSV file or click to browse."
+            "name": "Drop the workbook or the section CSV",
+            "text": "Open the converter and drop the .xlsx, .xls, .csv or .tsv file. Parsing happens in the page, so nothing is uploaded."
         },
         {
             "@type": "HowToStep",
             "position": 2,
-            "name": "Configure",
-            "text": "Set delimiter, header row, type detection, and nested mapping options."
+            "name": "Pick the section sheet",
+            "text": "A GSTR-1 workbook usually carries B2B, B2CL, B2CS and CDNR on separate sheets. Choose the one you need; leave nested mapping off for a flat array of rows."
         },
         {
             "@type": "HowToStep",
             "position": 3,
-            "name": "Convert & Download",
-            "text": "Click Convert to JSON and download or copy the result."
+            "name": "Download the JSON",
+            "text": "The result is a general CSV to JSON conversion for your ERP, accounting API or reconciliation script. The portal upload takes only the JSON produced by the official Offline Tool."
         }
     ]
 }
@@ -103,6 +103,14 @@
             "acceptedAnswer": {
                 "@type": "Answer",
                 "text": "The GST Offline Tool often fails to generate JSON files on large or complex CSV exports, and it requires downloading and installing software. Our browser-based converter avoids this entirely — it runs in your browser, handles large files, and generates JSON instantly without any installation."
+            }
+        },
+        {
+            "@type": "Question",
+            "name": "Which version of the GST Offline Tool should I use for GSTR-1?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Whatever the GST portal publishes today under Downloads → Returns Offline Tool. The utility is versioned per return type and the number changes between financial years, so a “latest version” quoted in a blog post or a video is usually stale — check the download page itself. GSTR 1, GSTR-1 and GSTR1 all name the same return, and all three spellings appear in exports. If the current version refuses to generate JSON for a large export, the section CSV it could not map is exactly what this converter reads instead. For the portal upload you still need the JSON that tool produces."
             }
         },
         {
@@ -193,8 +201,9 @@
         <h2>Excel to JSON for GSTR-1 (one drop)</h2>
         <p>Keeping invoice data in Excel? Drop the workbook itself — no need to save it as CSV first. The converter reads <strong>.xlsx</strong> and <strong>.xls</strong> directly, shows a sheet picker when the book has several sections (B2B, B2CL, B2CS…), and everything runs in your browser with no upload of your tax data.</p>
         <ol class="seo-steps">
-            <li><strong>Save the Excel sheet as CSV</strong> — in Excel: File → Save As → CSV (UTF-8). Your GSTR-1 invoice columns (GSTIN, invoice number, taxable value, tax rate…) are preserved exactly.</li>
-            <li><strong>Convert the CSV to JSON here</strong> — drop the file into the converter, enable nested mapping if your accounting API expects a nested structure, and download the JSON for the GST portal or your API.</li>
+            <li><strong>Drop the workbook or the section CSV</strong> — .xlsx, .xls, .csv and .tsv are read as they are. Nothing is uploaded: parsing happens in the page, so the invoice data never leaves your machine.</li>
+            <li><strong>Pick the section sheet</strong> — a GSTR-1 workbook usually carries B2B, B2CL, B2CS and CDNR on separate sheets. Choose the one you need; leave nested mapping off for a flat array of rows.</li>
+            <li><strong>Download the JSON</strong> — it is a general CSV→JSON result for your ERP, accounting API or reconciliation script. The portal upload itself takes only the JSON produced by the official Offline Tool, which this converter does not replace.</li>
         </ol>
         <p>Batch tip: for monthly filings, save each month's sheet as CSV and drop all of them at once — batch mode returns every JSON file in a single ZIP, or merges the months into one consolidated JSON array.</p>
 
@@ -232,6 +241,7 @@
 <details class="faq-item"><summary>Is my GST data safe?</summary><p>Yes. All processing is 100% browser-side. Your GST data never leaves your device — no upload, no server, no cloud. This is especially important for sensitive financial and tax data.</p></details>
 <details class="faq-item"><summary>How much does it cost?</summary><p>5 free conversions (each batch counts as one). For monthly GST filing, the $5 lifetime license pays for itself immediately — unlimited conversions forever, no subscription.</p></details>
 <details class="faq-item"><summary>Why can't I create a JSON file from the GST Offline Tool?</summary><p>The GST Offline Tool often fails to generate JSON files on large or complex CSV exports, and it requires downloading and installing software. Our browser-based converter avoids this entirely — it runs in your browser, handles large files, and generates JSON instantly without any installation.</p></details>
+<details class="faq-item"><summary>Which version of the GST Offline Tool should I use for GSTR-1?</summary><p>Whatever the GST portal publishes today under Downloads → Returns Offline Tool. The utility is versioned per return type and the number changes between financial years, so a “latest version” quoted in a blog post or a video is usually stale — check the download page itself. GSTR 1, GSTR-1 and GSTR1 all name the same return, and all three spellings appear in exports. If the current version refuses to generate JSON for a large export, the section CSV it could not map is exactly what this converter reads instead. For the portal upload you still need the JSON that tool produces.</p></details>
 <details class="faq-item"><summary>Do I need to download the GST Offline Tool to convert CSV to JSON?</summary><p>No. Our converter works entirely in your browser — no download, no installation, no upload. Just drop your GSTR1 or GSTR3B CSV file and get JSON instantly. This is faster and more reliable than the offline tool, and your tax data never leaves your device.</p></details>
 <details class="faq-item"><summary>What is CSV in the GST portal?</summary><p>The GST portal doesn't accept CSV directly. The official GST Offline Tool stores your invoice data as CSV files (one per section — B2B, B2CL, B2CS, CDNR), but the portal's upload interface expects JSON. A CSV-to-JSON converter turns those files into JSON you can feed to your accounting software, ERP or API. Note that the portal's own upload field expects the GSTR-1 JSON schema generated by the Offline Tool — a general converter is for your downstream systems, not a replacement for that upload.</p></details>
 <details class="faq-item"><summary>Can I convert Excel to JSON for GSTR-1?</summary><p>Yes — drop the .xlsx workbook straight in. The converter reads Excel natively (no “Save As CSV” detour), picks the sheet that looks like a data table, and lets you switch sheets if the book has several sections. Invoice numbers, HSN codes and pincodes with leading zeros stay text, so 0401 does not silently become 401.</p></details>
