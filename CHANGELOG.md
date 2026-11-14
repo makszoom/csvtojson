@@ -171,3 +171,20 @@
 Разобрал форму до конца: обязательные select `directory`/`website_type`, скрытые `csrf_token`/`form_started_at`/`form_origin`, honeypot-поле `website` (не отправляется), ограничения на длины полей. Поймал две ошибки по очереди: `invalid_directory` (не отправлял select) и `invalid_differentiator` (поле 280 символов, у меня было 330). После исправлений площадка ответила `code=throttle` — лимит на частоту попыток, четыре попытки за сессию его исчерпали.
 
 Рабочее решение сохранено как `scripts/submit-zearches.py`: валидирует длины полей до отправки, подставляет свежие скрытые токены, ждёт 12 секунд (площадка смотрит на время заполнения), умеет `--dry-run`. Запускать не чаще раза в сутки — повтор при `throttle` продлевает блокировку.
+
+## 2026-11-14 — GitHub-канал: два списка отсеяны проверкой, один PR создан
+
+**Отсеяно ДО работы (проверка активности и правил):**
+
+| Список | Вердикт |
+|---|---|
+| `iAnonymous3000/awesome-privacy-tools` (70★) | **Мёртв.** Последний коммит 2024-11-19, 33 открытых PR висят месяцами (в т.ч. #43 «Add AI convertly under File Conversion» с 2026-08). PR туда = 0 результата. |
+| `ripienaar/free-for-dev` (142k★, коммит вчера) | **Явный запрет в CONTRIBUTING.** Дословно: «Generic developer "toolbox" sites - format converters, calculators etc, we have too many already and more will not add value». Плюс «we do not accept AI generated edits… we will close it without discussion». Наш продукт — ровно format converter. |
+| `burningtree/awesome-json` (1577★, 2026-06-19, 5/5 последних PR смержены) | **Подходит.** Есть раздел «Online tools», где уже стоят `CSV to JSON` (alef.website) и `JSON to CSV` (konklone). |
+
+**PR создан и проверен:** https://github.com/burningtree/awesome-json/pull/380
+- Одна строка в раздел **Online tools**, сразу после существующего CSV→JSON конвертера.
+- Соблюдены правила из CONTRIBUTING: формат `* [name](url) - описание с точкой`; **JSON в описании не упоминается** (по правилу списка «Don't mention JSON in the description as it's implied»); trailing whitespace вычищен по всему файлу.
+- Проверено через API: `README.md +1 -0`, `state=open`, `mergeable=True`, 1 коммит.
+
+**Итого GitHub-канал:** два PR (#183 AwesomeCSV, #380 awesome-json). Оба чистые, по одной строке. Правило на будущее: перед PR проверять три вещи — дату последнего коммита, мержатся ли PR за последние месяцы, и нет ли в CONTRIBUTING запрета на тип продукта.
