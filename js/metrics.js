@@ -49,6 +49,13 @@
         return host.slice(0, 60);
     }
 
+    /* Тестовый прогон (E2E против живого сайта) не должен попадать в статистику:
+       иначе цифры воронки смешиваются с прогонами робота, и замер каналов врёт.
+       Метка ставится в URL: ?e2e=1 */
+    function isTestTraffic(search) {
+        return /[?&]e2e=1(&|$)/.test(String(search || ''));
+    }
+
     function buildPayload(event, path, extra) {
         var payload = { e: String(event || ''), p: String(path || '/').slice(0, 120) };
         if (extra && extra.type) payload.t = String(extra.type).slice(0, 8);
@@ -66,6 +73,10 @@
         if (!isValidEvent(event)) return false;
         if (!isEnabled()) return false;
         if (dntEnabled(opts.navigator)) return false;
+        var search = opts.search !== undefined
+            ? opts.search
+            : (typeof location !== 'undefined' ? location.search : '');
+        if (isTestTraffic(search)) return false;
         // navigator/fetch можно подставить явно — так модуль тестируется без браузера
 
 
@@ -108,6 +119,7 @@
         isValidEvent: isValidEvent,
         buildPayload: buildPayload,
         referrerHost: referrerHost,
+        isTestTraffic: isTestTraffic,
         dntEnabled: dntEnabled,
         EVENTS: EVENTS.slice(),
         setEndpoint: function (url) { METRICS_URL = String(url || ''); },

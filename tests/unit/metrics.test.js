@@ -57,3 +57,14 @@ ok('URL отправки — наш воркер', sent && /csvtojson-metrics/.t
 ok('невалидное событие не отправляется', M.track('hack', { navigator: fakeNav }) === false);
 ok('DNT блокирует отправку при включённом endpoint',
    M.track('page_view', { navigator: { doNotTrack: '1' } }) === false);
+
+// ── изоляция тестового трафика: E2E-прогон не должен попадать в статистику ──
+ok('метка e2e распознаётся', M.isTestTraffic('?e2e=1') === true);
+ok('метка e2e среди других параметров', M.isTestTraffic('?foo=bar&e2e=1') === true);
+ok('обычный запрос не тестовый', M.isTestTraffic('') === false);
+ok('query без e2e не тестовый', M.isTestTraffic('?utm_source=x') === false);
+ok('отсутствующий search не тестовый', M.isTestTraffic(null) === false);
+ok('e2e=0 не считается тестом', M.isTestTraffic('?e2e=0') === false);
+ok('track молчит на тестовом прогоне',
+   M.track('page_view', { search: '?e2e=1', navigator: fakeNav, fetchImpl: () => Promise.resolve() }) === false);
+ok('track работает без метки', M.track('page_view', { search: '', path: '/x', navigator: fakeNav }) === true);

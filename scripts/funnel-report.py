@@ -47,6 +47,7 @@ def main():
         return
 
     totals = {e: 0 for e in ORDER}
+    print("Тестовые прогоны (?e2e=1) счётчиком не учитываются — в таблице только живой трафик.")
     print(f"{'день':<12}" + "".join(f"{e:<16}" for e in ORDER))
     for day in sorted(data):
         row = data[day]

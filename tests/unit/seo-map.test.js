@@ -43,5 +43,7 @@ eq('все title уникальны', new Set(titles).size, titles.length);
 
 const decode = (s) => s.replace(/&amp;/g, '&').replace(/&mdash;/g, '—').replace(/&quot;/g, '"');
 const gstTitle = decode(read('seo/csv-to-json-for-gst.html').match(/<title>(.*?)<\/title>/s)[1].trim());
-ok('title GST-страницы начинается с "Excel to JSON"', gstTitle.startsWith('Excel to JSON for GSTR-1'), gstTitle);
+ok('title GST-страницы начинается с "Excel to JSON Converter" (точная фраза топ-запроса)', gstTitle.startsWith('Excel to JSON Converter for GSTR-1'), gstTitle);
 ok('title GST-страницы уложен в 60 символов (не обрезается в выдаче)', gstTitle.length <= 60, `${gstTitle.length} символов`);
+ok('title главной уложен в 60 символов', decode(read('index.html').match(/<title>(.*?)<\/title>/s)[1].trim()).length <= 60,
+   `${decode(read('index.html').match(/<title>(.*?)<\/title>/s)[1].trim()).length} символов`);

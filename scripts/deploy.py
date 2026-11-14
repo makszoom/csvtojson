@@ -34,7 +34,7 @@ MAP_EXTRA = {
 
 # что НЕ деплоим никогда
 SKIP_PREFIX = ("tests/", "node_modules/", ".e2e-site/", "docs/", "backup", ".env", "package",
-               "scripts/", ".gitignore", "README", "workers/")
+               "scripts/", ".gitignore", "README", "workers/", "PLAN", "AUDIT", "CHANGELOG", "SKILL")
 
 
 def env_token():

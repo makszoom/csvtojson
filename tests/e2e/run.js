@@ -15,6 +15,10 @@ const PORT = 8123;
 const ROOT = path.resolve(__dirname, '..', '..');
 const BASE = LIVE ? 'https://csv-to-json.com' : `http://127.0.0.1:${PORT}`;
 
+/* Метка e2e: на живом сайте счётчик не должен считать прогон робота за человека.
+   Локальный сервер метку не несёт — там endpoint метрики всё равно отвечает 404. */
+const U = (path) => (LIVE ? `${BASE}${path}?e2e=1` : `${BASE}${path}`);
+
 /* Прод-раскладка: index/privacy/robots/sitemap в корне, лендинги из seo/*.html
    тоже в корне (на живом сайте /csv-to-json-for-gst.html), плюс css, js, vendor.
    Локальный сервер должен повторять это, иначе относительные пути врут. */
@@ -84,7 +88,7 @@ const CSV = 'invoice_no,hsn,taxable,party\n00721,0401,1500.50,"Ann, Ltd"\n00012,
 
         // ── 1. Главная: инструмент живёт, конвертация работает, типы не портят ID ──
         console.log('\n[index] главная страница');
-        let p = await freshPage(`${BASE}/index.html`);
+        let p = await freshPage(U('/index.html'));
         ok('заголовок страницы', (await p.evalJS('document.title')).includes('CSV to JSON'));
         ok('drop-зона есть', await p.evalJS('!!document.getElementById("dropZone")'));
         ok('модуль инструмента инициализирован', (await p.evalJS('window.CSVtoJSON && window.CSVtoJSON.ready')) === true);
@@ -116,7 +120,7 @@ const CSV = 'invoice_no,hsn,taxable,party\n00721,0401,1500.50,"Ann, Ltd"\n00012,
         await p.evalJS('localStorage.setItem("csvtojson_used", "5"); localStorage.removeItem("csvtojson_unlocked");');
         ok('лимит записан в хранилище', (await p.evalJS('localStorage.getItem("csvtojson_used")')) === '5');
         await p.close();
-        p = await openPage(`${BASE}/index.html`);   // модуль читает счётчик при загрузке
+        p = await openPage(U('/index.html'));   // модуль читает счётчик при загрузке
         ok('при загрузке виден исчерпанный лимит', (await p.evalJS('document.getElementById("counter").textContent')).includes('0'));
         await dropFile(p.evalJS, { name: 'gstr1.csv', text: CSV });
         await new Promise((r) => setTimeout(r, 600));
@@ -135,7 +139,7 @@ const CSV = 'invoice_no,hsn,taxable,party\n00721,0401,1500.50,"Ann, Ltd"\n00012,
         ];
         for (const [slug, variant] of landings) {
             console.log(`\n[${slug}] лендинг, вариант ${variant}`);
-            p = await freshPage(`${BASE}/${slug}.html`);
+            p = await freshPage(U(`/${slug}.html`));
             ok('точка монтирования на месте', await p.evalJS('!!document.getElementById("toolMount")'));
             ok('разметка смонтирована', await p.evalJS('!!document.getElementById("dropZone")'));
             ok('вариант применён', (await p.evalJS('document.getElementById("toolMount").getAttribute("data-variant-applied")')) === variant);
@@ -171,7 +175,7 @@ const CSV = 'invoice_no,hsn,taxable,party\n00721,0401,1500.50,"Ann, Ltd"\n00012,
 
         // ── 3b. Excel: .xlsx читается напрямую, лист можно переключить ──
         console.log('\n[excel] главная страница');
-        p = await freshPage(`${BASE}/index.html`);
+        p = await freshPage(U('/index.html'));
         const dropped = await dropBinary(p.evalJS, { name: 'gstr1.xlsx', base64: xlsxB64 });
         ok('Excel-файл подан', dropped && dropped.ok);
         await new Promise((r) => setTimeout(r, 2500));   // ленивая загрузка SheetJS
@@ -210,14 +214,14 @@ const CSV = 'invoice_no,hsn,taxable,party\n00721,0401,1500.50,"Ann, Ltd"\n00012,
 
         // ── 4. Страница без инструмента не должна падать ──
         console.log('\n[privacy] страница без инструмента');
-        p = await openPage(`${BASE}/privacy.html`);
+        p = await openPage(U('/privacy.html'));
         ok('privacy открывается', (await p.evalJS('document.title')).length > 0);
         ok('ошибок JS на странице без инструмента нет', collectors.exceptions.length === 0, collectors.exceptions.join(' | '));
         await p.close();
 
         // ── 5. GSTR-1 JSON -> Excel: инструмент, сводка, скачивание, ошибки ──
         console.log('\n[gstr1] JSON -> Excel');
-        p = await openPage(`${BASE}/gstr1-json-to-excel.html`);
+        p = await openPage(U('/gstr1-json-to-excel.html'));
         ok('страница GSTR-1 открывается', (await p.evalJS('document.title')).includes('GSTR-1 JSON to Excel'));
         ok('модуль приложения поднялся', (await p.evalJS('window.__gstr1App && window.__gstr1App.ready')) === true);
         ok('ядро gstr1-core подключено', (await p.evalJS('typeof window.CSVtoJSONGstr1 === "object"')));
@@ -268,7 +272,7 @@ const CSV = 'invoice_no,hsn,taxable,party\n00721,0401,1500.50,"Ann, Ltd"\n00012,
         z.file('gstr1-032026.json', JSON.stringify(GSTR1));
         z.file('gstr1-042026.json', JSON.stringify(GSTR1));
         const zipB64 = await z.generateAsync({ type: 'base64' });
-        p = await openPage(`${BASE}/gstr1-json-to-excel.html`);
+        p = await openPage(U('/gstr1-json-to-excel.html'));
         const dropZ = await dropBinary(p.evalJS, { name: 'GSTR1-FY2026.zip', base64: zipB64, mime: 'application/zip' });
         ok('ZIP подан', dropZ && dropZ.ok, JSON.stringify(dropZ));
         await sleep(2000);
@@ -290,7 +294,7 @@ const CSV = 'invoice_no,hsn,taxable,party\n00721,0401,1500.50,"Ann, Ltd"\n00012,
 
         // ── 6. Не-GSTR-1 файл: понятная ошибка, а не тихий пустой экран ──
         console.log('\n[gstr1] чужой JSON');
-        p = await openPage(`${BASE}/gstr1-json-to-excel.html`);
+        p = await openPage(U('/gstr1-json-to-excel.html'));
         await dropFile(p.evalJS, { name: 'wrong.json', text: '{"foo":1,"bar":[2,3]}' });
         await sleep(1200);
         const statusText = await p.evalJS('document.getElementById("statusBox").textContent');
