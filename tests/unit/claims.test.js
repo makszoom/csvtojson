@@ -7,13 +7,32 @@ const forbidden = [
     'upload it to the portal',
     'upload valid JSON to the portal',
     'valid JSON, and upload',
-    'portal-ready'
+    'portal-ready',
+    // Формулировка «скачайте JSON для портала» — то же ложное обещание другими словами.
+    // Наш конвертер отдаёт общий CSV→JSON; portal-схему делает только Offline Tool.
+    'JSON for the GST portal',
+    'JSON for the portal',
+    'download the JSON for the GST'
 ];
 
 const htmls = ['index.html', 'privacy.html'].concat(files('seo').map(f => 'seo/' + f));
+
+// Фраза в кавычках — это цитата чужого обещания (страница может предупреждать о ней),
+// а не наше обещание. Считаем только вхождения вне кавычек.
+function unquotedHits(src, phrase) {
+    const hits = [];
+    let i = src.indexOf(phrase);
+    while (i !== -1) {
+        const prev = src.slice(Math.max(0, i - 1), i);
+        if (!/["“”'«]/.test(prev)) hits.push(phrase);
+        i = src.indexOf(phrase, i + 1);
+    }
+    return hits;
+}
+
 for (const h of htmls) {
     const src = read(h);
-    const hits = forbidden.filter(f => src.includes(f));
+    const hits = forbidden.flatMap(f => unquotedHits(src, f));
     ok(`${h}: нет ложного обещания про портал`, hits.length === 0, 'найдено: ' + hits.join(' | '));
 }
 

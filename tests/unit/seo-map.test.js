@@ -6,7 +6,7 @@ console.log('\n[seo-map.test.js] sitemap и canonical');
 const sitemap = read('sitemap.xml');
 const urls = [...sitemap.matchAll(/<loc>(.*?)<\/loc>/g)].map((m) => m[1]);
 
-eq('в sitemap ровно 9 URL', urls.length, 9);
+eq('в sitemap ровно 10 URL', urls.length, 10);
 ok('в sitemap нет слитой страницы convert-csv-to-json',
    !urls.some((u) => u.includes('convert-csv-to-json')), urls.join(', '));
 ok('GST-страница в sitemap есть', urls.some((u) => u.includes('csv-to-json-for-gst')));
@@ -22,7 +22,8 @@ const pages = {
     'seo/gstr1-json-to-excel.html': 'https://csv-to-json.com/gstr1-json-to-excel',
     'seo/gst-offline-tool-json-not-generating.html': 'https://csv-to-json.com/gst-offline-tool-json-not-generating',
     'seo/how-to-convert-excel-to-json-for-gst.html': 'https://csv-to-json.com/how-to-convert-excel-to-json-for-gst',
-    'seo/gstr1-download-in-excel.html': 'https://csv-to-json.com/gstr1-download-in-excel'
+    'seo/gstr1-download-in-excel.html': 'https://csv-to-json.com/gstr1-download-in-excel',
+    'seo/best-csv-to-json-converters.html': 'https://csv-to-json.com/best-csv-to-json-converters'
 };
 for (const [file, canonical] of Object.entries(pages)) {
     const src = read(file);

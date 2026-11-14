@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Best Free CSV to JSON Converters — Honest Comparison</title>
+    <meta name="description" content="Five free converters tested on what actually matters: does the file stay on your machine, what are the limits, and which ones beat us. We say where they are better.">
+    <link rel="canonical" href="https://csv-to-json.com/best-csv-to-json-converters">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9A%96%3C/text%3E%3C/svg%3E">
+    <link rel="stylesheet" href="css/style.css">
+
+    <meta property="og:title" content="Best Free CSV to JSON Converters — Honest Comparison">
+    <meta property="og:description" content="Five free converters compared on privacy, limits and output quality — including the two that beat us on features.">
+    <meta property="og:url" content="https://csv-to-json.com/best-csv-to-json-converters">
+    <meta property="og:type" content="article">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Best Free CSV to JSON Converters — Honest Comparison">
+    <meta name="twitter:description" content="Five free converters compared on privacy, limits and output — including where competitors are better than us.">
+
+    <script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+        {
+            "@type": "Question",
+            "name": "Which free CSV to JSON converter is actually free?",
+            "acceptedAnswer": { "@type": "Answer", "text": "CSVJSON and TableConvert are free with no counter and no paywall. This site allows five conversions and then asks for a one-time $5 — the comparison table below says so in the price row rather than hiding it." }
+        },
+        {
+            "@type": "Question",
+            "name": "Do these converters upload my file?",
+            "acceptedAnswer": { "@type": "Answer", "text": "It depends, and the marketing text is not enough. CSVJSON and TableConvert state that processing is client-side. JSON Formatter converts in the browser but sends uploaded files to /service/uploadFile, and CodeBeautify states that on file upload data travels between server and client. So 'browser-based' often describes pasting text, not dropping a file." }
+        },
+        {
+            "@type": "Question",
+            "name": "Which one should I use for very large files?",
+            "acceptedAnswer": { "@type": "Answer", "text": "CodeBeautify caps input at 1 MB and TableConvert at 10 MB. CSVJSON and ConvertCSV publish no numeric limit. This site's limit is your machine's memory — there is no server quota, but a very large workbook will be slow." }
+        }
+    ]
+}
+    </script>
+</head>
+<body>
+    <header class="header">
+        <div class="container header-inner">
+            <a href="index.html" class="logo">
+                <span class="logo-icon">📋</span>
+                <span class="logo-text">CSV<span class="logo-accent">→</span>JSON</span>
+            </a>
+            <div class="header-badges">
+                <span class="badge badge-free">Free</span>
+                <span class="badge badge-privacy">No Upload</span>
+            </div>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container">
+            <h1>Best Free CSV to JSON<br><span class="hero-accent">Converters</span></h1>
+            <p class="hero-subtitle">Five tools, compared on three things that actually matter: whether your file leaves your machine, what the limits are, and what the output really looks like. Two of them beat us on features — that is in the table too.</p>
+        </div>
+    </section>
+
+    <main class="container seo-content">
+        <h2>How this comparison was done</h2>
+        <p>Every claim below comes from the tool's own pages and its published JavaScript, checked on 14 November 2026. No file uploads were performed to sniff network traffic, so where a site's text and its code disagree, both are quoted. If a limit is not published, it is written as "not stated" rather than guessed.</p>
+
+        <h2>The table</h2>
+        <table class="seo-table">
+            <thead>
+                <tr><th>Tool</th><th>Where it runs</th><th>Account</th><th>Limit</th><th>Nested</th><th>Batch</th><th>Price</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><strong>CSVJSON</strong></td><td>Browser, stated plainly</td><td>None</td><td>Not stated</td><td>Not stated</td><td>No</td><td>Free</td></tr>
+                <tr><td><strong>TableConvert</strong></td><td>Browser, stated plainly</td><td>None for the web tool</td><td>10 MB</td><td>Not stated</td><td>No</td><td>Free (API paid)</td></tr>
+                <tr><td><strong>ConvertCSV</strong></td><td>Browser for paste and file; URL is read by their server</td><td>None</td><td>Not stated</td><td><strong>Yes</strong>, via <code>/</code> in headers</td><td>No</td><td>Free (desktop from $1299)</td></tr>
+                <tr><td><strong>JSON Formatter</strong></td><td>Converts in browser, but uploads the file to <code>/service/uploadFile</code></td><td>Not needed to convert</td><td>Not stated</td><td>No</td><td>No</td><td>Free</td></tr>
+                <tr><td><strong>CodeBeautify</strong></td><td>Conversion client-side; file upload passes through their server</td><td>Not clearly stated</td><td><strong>1 MB</strong></td><td>No</td><td>No</td><td>Free</td></tr>
+                <tr><td><strong>This site</strong></td><td>Browser only, including drag-and-drop</td><td>None</td><td>Your machine's memory</td><td><strong>Yes</strong>, dot-notation</td><td><strong>Yes</strong>, + ZIP</td><td>5 free, then $5 once</td></tr>
+            </tbody>
+        </table>
+
+        <h2>Where the competitors are better than us</h2>
+        <p>Being straight about this is cheaper than being caught out by a reader who tries both.</p>
+        <ul>
+            <li><strong>CSVJSON takes input we do not.</strong> It accepts TSV, Markdown tables, multiple tables copied out of ChatGPT, and <code>psql</code>/MySQL box output. If you are pasting data out of a chat window or a terminal, it is the better tool and it is free.</li>
+            <li><strong>TableConvert gives you more output shapes.</strong> JSON object arrays, 2D arrays, column arrays, key-value pairs and a separate JSONLines route. Ours produces one structure with optional nesting.</li>
+            <li><strong>ConvertCSV has a desktop version.</strong> Its online converter is free, and the paid desktop/CLI builds ($1299 or $4999 a year, enterprise licences) exist for people who need batch on their own machines without a browser.</li>
+            <li><strong>Two of them are genuinely and permanently free.</strong> CSVJSON and TableConvert carry no counter. We allow five conversions and then ask for $5 once — that is a real difference, not a rounding error.</li>
+        </ul>
+
+        <h2>Where this site is different</h2>
+        <ul>
+            <li><strong>The file does not leave the tab, in any input mode.</strong> This is narrower than it sounds, and it is the point: JSON Formatter converts in the browser but posts uploaded files to <code>/service/uploadFile</code>, and CodeBeautify states that on file upload "data traverse between server and client". So "browser-based" on their pages mostly describes pasting text. Ours covers drag-and-drop too.</li>
+            <li><strong>Nested output with dot-notation.</strong> Write <code>address.city</code> in the column mapping and get <code>{"address":{"city":…}}</code>. ConvertCSV does this through <code>/</code> in headers; the others do not offer it.</li>
+            <li><strong>Batch and ZIP.</strong> Drop several files, get one JSON each or a merged array. None of the five offer this on their free pages.</li>
+            <li><strong>.xlsx directly.</strong> No "Save as CSV" detour — the workbook is read in the browser with a sheet picker.</li>
+        </ul>
+
+        <h2>Which one to pick</h2>
+        <ul>
+            <li><strong>Pasting text from a chat or a terminal:</strong> CSVJSON. It handles formats we do not, and it is free.</li>
+            <li><strong>Need many output shapes or JSONLines:</strong> TableConvert.</li>
+            <li><strong>Client data that must not leave your machine, especially as .xlsx:</strong> this site. It is the only case where the difference is structural rather than a feature list.</li>
+            <li><strong>One small CSV, once:</strong> any of them. Use whichever page is already open.</li>
+        </ul>
+
+        <h2>Try ours</h2>
+        <p>The converter is on the <a href="index.html">home page</a> and on the <a href="csv-to-json.html">CSV to JSON</a> page. If your data is a GST return, the <a href="csv-to-json-for-gst.html">GSTR-1 page</a> covers the excel-specific pitfalls — leading zeros in HSN, section splits, dates.</p>
+    </main>
+
+    <section class="faq-section">
+        <div class="container">
+            <h2 class="section-title-center">Frequently Asked Questions</h2>
+            <div class="faq-list" style="max-width:680px;margin:0 auto;">
+                <details class="faq-item"><summary>Which free CSV to JSON converter is actually free?</summary><p>CSVJSON and TableConvert are free with no counter and no paywall. This site allows five conversions and then asks for a one-time $5 — the table says so in the price row rather than hiding it.</p></details>
+                <details class="faq-item"><summary>Do these converters upload my file?</summary><p>It depends, and the marketing text is not enough. CSVJSON and TableConvert state processing is client-side. JSON Formatter converts in the browser but sends uploaded files to /service/uploadFile. CodeBeautify states that on file upload data travels between server and client. "Browser-based" often describes pasting text, not dropping a file.</p></details>
+                <details class="faq-item"><summary>Which one handles very large files?</summary><p>CodeBeautify caps input at 1 MB, TableConvert at 10 MB. CSVJSON and ConvertCSV publish no numeric limit. Here the limit is your machine's memory — no server quota, but a very large workbook will be slow.</p></details>
+                <details class="faq-item"><summary>How was this comparison verified?</summary><p>From each tool's own pages, FAQ, privacy policy and published JavaScript, checked on 14 November 2026. No files were uploaded to capture network traffic, so where text and code disagree both are quoted, and unpublished limits are marked "not stated" instead of guessed.</p></details>
+            </div>
+        </div>
+    </section>
+
+    <section class="features-section">
+        <div class="container">
+            <h2 class="section-title-center">Related</h2>
+            <div class="related-grid">
+                <a href="csv-to-json.html" class="related-card"><span class="related-icon">📄</span><span class="related-title">CSV to JSON Converter</span></a>
+                <a href="csv-to-json-for-gst.html" class="related-card"><span class="related-icon">📑</span><span class="related-title">Excel to JSON for GSTR-1</span></a>
+                <a href="gstr1-download-in-excel.html" class="related-card"><span class="related-icon">📊</span><span class="related-title">GSTR-1 Download in Excel</span></a>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <p class="footer-text">CSV to JSON converters compared · Browser-Side · No Upload · <a href="index.html">Home</a></p>
+        </div>
+    </footer>
+</body>
+</html>

@@ -339,6 +339,14 @@ const CSV = 'invoice_no,hsn,taxable,party\n00721,0401,1500.50,"Ann, Ltd"\n00012,
         ok('ведущий ноль HSN сохранён', hOut.includes('0401'));
         ok('нет JS-ошибок на how-to', collectors.exceptions.length === 0, collectors.exceptions.join(' | '));
         await p.close();
+        // ── 8. Страница сравнения конвертеров ──
+        console.log('\n[compare] best-csv-to-json-converters');
+        p = await openPage(U('/best-csv-to-json-converters.html'));
+        ok('страница сравнения открывается', (await p.evalJS('document.title')).includes('Best Free CSV to JSON'));
+        ok('таблица с 6 строками (конкуренты + мы)', (await p.evalJS('document.querySelectorAll(".seo-table tbody tr").length')) === 6);
+        ok('есть раздел «где конкуренты лучше»', (await p.evalJS('document.body.innerText')).includes('Where the competitors are better than us'));
+        ok('нет JS-ошибок на странице сравнения', collectors.exceptions.length === 0, collectors.exceptions.join(' | '));
+        await p.close();
 
     } catch (e) {
         failed++;
