@@ -4,19 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GSTR-1 JSON to Excel Converter — All Sections, No Upload</title>
-    <meta name="description" content="Convert a GSTR-1 JSON file or the portal ZIP into a multi-sheet Excel workbook: B2B, B2CL, B2CS, CDNR, EXP, HSN, DOC, NIL plus a totals summary. Runs in your browser — the client's file never leaves your machine.">
+    <meta name="description" content="Turn a GSTR-1 JSON or portal ZIP into a multi-sheet Excel workbook: B2B, B2CL, B2CS, CDNR, EXP, HSN, DOC, NIL plus totals. In your browser, no upload.">
     <link rel="canonical" href="https://csv-to-json.com/gstr1-json-to-excel">
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E📑%3C/text%3E%3C/svg%3E">
     <link rel="stylesheet" href="css/style.css">
 
     <meta property="og:title" content="GSTR-1 JSON to Excel Converter — All Sections, No Upload">
-    <meta property="og:description" content="Turn a GSTR-1 JSON (or the portal ZIP) into a multi-sheet Excel workbook with a totals summary. 100% browser-side: the file never leaves your machine.">
+    <meta property="og:description" content="Turn a GSTR-1 JSON or portal ZIP into a multi-sheet Excel workbook: B2B, B2CL, B2CS, CDNR, EXP, HSN, DOC, NIL plus totals. In your browser, no upload.">
     <meta property="og:url" content="https://csv-to-json.com/gstr1-json-to-excel">
     <meta property="og:type" content="website">
 
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="GSTR-1 JSON to Excel Converter — All Sections, No Upload">
-    <meta name="twitter:description" content="Turn a GSTR-1 JSON (or the portal ZIP) into a multi-sheet Excel workbook with a totals summary. 100% browser-side.">
+    <meta name="twitter:description" content="Turn a GSTR-1 JSON or portal ZIP into a multi-sheet Excel workbook: B2B, B2CL, B2CS, CDNR, EXP, HSN, DOC, NIL plus totals. In your browser, no upload.">
 
     <script type="application/ld+json">
 {
@@ -33,39 +33,68 @@
 }
     </script>
 
-    <script type="application/ld+json">
-{
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    "mainEntity": [
-        {
-            "@type": "Question",
-            "name": "Is the client's GSTR-1 data uploaded anywhere?",
-            "acceptedAnswer": { "@type": "Answer", "text": "No. The file is read by your browser and never sent to a server. There is no upload endpoint in this tool — which matters for client invoice data under a confidentiality clause and under the DPDP Act, where handing a client's return to an unknown website is a problem you own." }
-        },
-        {
-            "@type": "Question",
-            "name": "Can I drop the ZIP downloaded from the GST portal?",
-            "acceptedAnswer": { "@type": "Answer", "text": "Yes. The ZIP is opened in the browser and every JSON inside it is converted. Drop several ZIPs at once to get one workbook for the whole year." }
-        },
-        {
-            "@type": "Question",
-            "name": "Which sections are covered?",
-            "acceptedAnswer": { "@type": "Answer", "text": "B2B, B2BA, B2CL, B2CLA, B2CS, B2CSA, CDNR, CDNRA, CDNUR, EXP, EXPA, HSN, DOC, NIL, AT and ATADJ — each on its own sheet, one row per item, because one invoice can carry several tax rates." }
-        },
-        {
-            "@type": "Question",
-            "name": "Does it replace the GST Offline Tool?",
-            "acceptedAnswer": { "@type": "Answer", "text": "No. The portal accepts only the GSTR-1 JSON that the Offline Tool generates, so keep the tool for filing. This converter goes the other way: it turns a JSON you already have into readable Excel for review, reconciliation and audit." }
-        },
-        {
-            "@type": "Question",
-            "name": "Why is there a Summary sheet?",
-            "acceptedAnswer": { "@type": "Answer", "text": "Because the totals are what you actually check. The Summary is calculated from the rows, not copied from the file: records, taxable value and IGST/CGST/SGST/Cess per section, plus a TOTAL line to compare against the return." }
-        }
-    ]
-}
-    </script>
+    <script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Is the client's GSTR-1 data uploaded anywhere?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. There is no upload endpoint in this tool — it reads the file in the tab and builds the workbook locally. You can disconnect the network after the page loads and it still works."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I drop the ZIP from the GST portal?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. The ZIP is unpacked in the browser and every JSON inside is converted. Drop several ZIPs at once and they merge into one workbook — that is how you build a full-year review file."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Which sections are covered?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "B2B, B2BA, B2CL, B2CLA, B2CS, B2CSA, CDNR, CDNRA, CDNUR, EXP, EXPA, HSN, DOC, NIL, AT and ATADJ. Empty sections are skipped instead of leaving blank sheets."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Are invoice numbers and HSN codes kept intact?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. HSN is written as text on purpose: 0401 stays 0401 and does not become 401. Invoice numbers with leading zeros stay as they are. Dates keep the portal's own DD-MM-YYYY format so nothing is re-interpreted."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Does it replace the GST Offline Tool?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. The portal accepts only the JSON that the Offline Tool generates. This converter goes the other direction — JSON you already have becomes readable Excel for review, reconciliation and audit."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How large a file can it handle?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The limit is your machine's memory, not a server quota. A monthly return for a mid-size client converts instantly; a full year of ZIPs takes a few seconds and produces one workbook."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How much does it cost?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Nothing. No signup, no limit, no paywall — the tool exists because reading a GSTR-1 JSON is a weekly problem for anyone filing returns."
+      }
+    }
+  ]
+}</script>
     <!-- Cloudflare Web Analytics (cookieless) -->
     <script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "2e420e4568214ef084b96222d60db4cd"}'></script>
 </head>
@@ -142,7 +171,7 @@
     <section class="faq-section">
         <div class="container">
             <h2 class="section-title-center">Frequently Asked Questions</h2>
-            <div class="faq-list" style="max-width:680px;margin:0 auto;">
+            <div class="faq-list faq-wrap">
                 <details class="faq-item"><summary>Is the client's GSTR-1 data uploaded anywhere?</summary><p>No. There is no upload endpoint in this tool — it reads the file in the tab and builds the workbook locally. You can disconnect the network after the page loads and it still works.</p></details>
                 <details class="faq-item"><summary>Can I drop the ZIP from the GST portal?</summary><p>Yes. The ZIP is unpacked in the browser and every JSON inside is converted. Drop several ZIPs at once and they merge into one workbook — that is how you build a full-year review file.</p></details>
                 <details class="faq-item"><summary>Which sections are covered?</summary><p>B2B, B2BA, B2CL, B2CLA, B2CS, B2CSA, CDNR, CDNRA, CDNUR, EXP, EXPA, HSN, DOC, NIL, AT and ATADJ. Empty sections are skipped instead of leaving blank sheets.</p></details>

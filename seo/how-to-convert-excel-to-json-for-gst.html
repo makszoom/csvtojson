@@ -4,19 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>How to Convert Excel to JSON for GST — Step by Step</title>
-    <meta name="description" content="Save the sheet as CSV, drop it in, download JSON — three steps, in your browser, nothing uploaded. Honest caveat: the portal's own upload needs the JSON its Offline Tool writes, not this file.">
+    <meta name="description" content="Save the sheet as CSV, drop it in, download JSON — three steps in your browser, nothing uploaded. Caveat: the portal needs the Offline Tool's own JSON.">
     <link rel="canonical" href="https://csv-to-json.com/how-to-convert-excel-to-json-for-gst">
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%93%84%3C/text%3E%3C/svg%3E">
     <link rel="stylesheet" href="css/style.css">
 
     <meta property="og:title" content="How to Convert Excel to JSON for GST — Step by Step">
-    <meta property="og:description" content="Three steps from a GST spreadsheet to JSON, in the browser, nothing uploaded. Plus what the portal actually accepts and what it does not.">
+    <meta property="og:description" content="Save the sheet as CSV, drop it in, download JSON — three steps in your browser, nothing uploaded. Caveat: the portal needs the Offline Tool's own JSON.">
     <meta property="og:url" content="https://csv-to-json.com/how-to-convert-excel-to-json-for-gst">
     <meta property="og:type" content="article">
 
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="How to Convert Excel to JSON for GST — Step by Step">
-    <meta name="twitter:description" content="Three steps from a GST spreadsheet to JSON, in the browser, nothing uploaded.">
+    <meta name="twitter:description" content="Save the sheet as CSV, drop it in, download JSON — three steps in your browser, nothing uploaded. Caveat: the portal needs the Offline Tool's own JSON.">
 
     <script type="application/ld+json">
 {
@@ -123,7 +123,7 @@
     <section class="faq-section">
         <div class="container">
             <h2 class="section-title-center">Frequently Asked Questions</h2>
-            <div class="faq-list" style="max-width:680px;margin:0 auto;">
+            <div class="faq-list faq-wrap">
                 <details class="faq-item"><summary>Will the GST portal accept this JSON?</summary><p>No. The portal accepts only the GSTR-1 JSON that its own Offline Tool generates, because it validates that file against its own schema. This converter produces general JSON for your ERP, API, reconciliation or review. Keep the Offline Tool for the upload itself.</p></details>
                 <details class="faq-item"><summary>Do I have to save my Excel as CSV first?</summary><p>No. Drop the .xlsx workbook directly. If the book has several sheets the converter shows a sheet picker and opens on the one that looks like a data table, not the title sheet.</p></details>
                 <details class="faq-item"><summary>Why do invoice numbers lose their leading zeros?</summary><p>Because spreadsheet software stores 00721 as the number 721 before any converter sees it. Keep the column as Text in Excel first, or set the column type to string in the converter. The same applies to HSN codes and pincodes.</p></details>
