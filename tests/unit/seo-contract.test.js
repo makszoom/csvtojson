@@ -120,6 +120,17 @@ for (const f of PAGES) {
     }
 }
 
+// --- 8. Широкая таблица не должна растягивать страницу на мобиле --------
+// 7-колоночная .seo-table без контейнера прокрутки расширяла body до 647px
+// при экране 390px: горизонтальный скролл появлялся у страницы, а не у таблицы.
+for (const f of PAGES) {
+    const s = read(f);
+    if (!/class="seo-table"/.test(s)) continue;
+    ok(`${f}: таблица лежит в контейнере прокрутки`, s.includes('class="seo-table-wrap"'));
+    ok(`${f}: .seo-table-wrap есть в CSS`,
+        fs.readFileSync(path.join(ROOT, 'css/style.css'), 'utf8').includes('.seo-table-wrap'));
+}
+
 console.log(`\nSEO-КОНТРАКТ: ${passed}/${passed + failed} PASS` + (failed ? `, ${failed} FAIL` : ''));
 if (failed) console.log('провалы: ' + fail.join(' | '));
 process.exit(failed ? 1 : 0);
