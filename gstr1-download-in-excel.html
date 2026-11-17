@@ -88,7 +88,8 @@
         <p>The cost is time. Expanding a full year of returns by hand takes far longer than importing one file, it needs Office 365 or Excel 2019 and above, and every section has its own nesting to expand. Fine for one client and one month; painful for a practice.</p>
 
         <h2>Which one to use</h2>
-        <table class="seo-table">
+        <div class="seo-table-wrap">
+            <table class="seo-table">
             <thead>
                 <tr><th></th><th>Offline Tool export</th><th>Browser converter</th><th>Power Query</th></tr>
             </thead>
@@ -101,6 +102,7 @@
                 <tr><td>Several months at once</td><td>One at a time</td><td>Drop them together, merged</td><td>One at a time</td></tr>
             </tbody>
         </table>
+        </div>
 
         <h2>What the workbook looks like</h2>
         <p>One sheet per section, named after the section — B2B, B2CL, B2CS, CDNR, EXP, HSN, DOC, NIL. Empty sections are skipped instead of leaving blank sheets. A <strong>Summary</strong> sheet sits first with records, taxable value and IGST/CGST/SGST/Cess per section plus a TOTAL line, computed from the rows rather than copied from the file.</p>
