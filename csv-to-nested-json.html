@@ -149,15 +149,15 @@
             <li><strong>Convert and download</strong> — click Convert, then copy or download your JSON file</li>
         </ol>
 
-        <div style="text-align:center;margin:40px 0;">
-            <a href="index.html" class="btn-primary" style="display:inline-block;width:auto;padding:16px 32px;text-decoration:none;">Try CSV to JSON Converter</a>
+        <div class="cta-block">
+            <a href="index.html" class="btn-primary btn-landing">Try CSV to JSON Converter</a>
         </div>
     </main>
 
     <section class="faq-section">
         <div class="container">
             <h2 class="section-title-center">Frequently Asked Questions</h2>
-            <div class="faq-list" style="max-width:680px;margin:0 auto;">
+            <div class="faq-list faq-wrap">
 <details class="faq-item"><summary>How do I create nested JSON from CSV?</summary><p>Name your CSV columns with dots: 'address.city', 'address.zip', 'items.0.title'. The converter automatically creates nested objects. You can also edit the JSON path for any column in the preview table.</p></details>
 <details class="faq-item"><summary>Can I create arrays in JSON from CSV?</summary><p>Yes. Use numeric indices in your column names: 'items.0.title', 'items.0.price', 'items.1.title'. These become array elements: items[0].title, items[1].title.</p></details>
 <details class="faq-item"><summary>What if my CSV columns don't have dots?</summary><p>No problem — you get flat JSON by default. You can manually enter dot-notation paths in the JSON Path field under each column in the preview table to create nested structures.</p></details>
