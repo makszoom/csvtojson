@@ -4,19 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GST Offline Tool Not Generating JSON — 8 Causes, Fixed</title>
-    <meta name="description" content="Utility hangs on Generate File or says the file was not created? Work through the eight real causes — duplicate HSN under two rates, cache, macros, date format. Free checklist.">
+    <meta name="description" content="Utility hangs on Generate File or says the file was not created? Work through eight real causes — duplicate HSN, cache, macros, date format. Free checklist.">
     <link rel="canonical" href="https://csv-to-json.com/gst-offline-tool-json-not-generating">
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%94%A7%3C/text%3E%3C/svg%3E">
     <link rel="stylesheet" href="css/style.css">
 
     <meta property="og:title" content="GST Offline Tool Not Generating JSON — 8 Causes, Fixed">
-    <meta property="og:description" content="Eight real causes why the GST offline utility hangs on Generate File, in the order worth checking. From the threads where accountants hit this monthly.">
+    <meta property="og:description" content="Utility hangs on Generate File or says the file was not created? Work through eight real causes — duplicate HSN, cache, macros, date format. Free checklist.">
     <meta property="og:url" content="https://csv-to-json.com/gst-offline-tool-json-not-generating">
     <meta property="og:type" content="article">
 
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="GST Offline Tool Not Generating JSON — 8 Causes, Fixed">
-    <meta name="twitter:description" content="Why the GST offline utility hangs on Generate File, in the order worth checking.">
+    <meta name="twitter:description" content="Utility hangs on Generate File or says the file was not created? Work through eight real causes — duplicate HSN, cache, macros, date format. Free checklist.">
 
     <script type="application/ld+json">
 {
@@ -34,34 +34,52 @@
 }
     </script>
 
-    <script type="application/ld+json">
-{
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    "mainEntity": [
-        {
-            "@type": "Question",
-            "name": "Why does Generate File hang and never finish?",
-            "acceptedAnswer": { "@type": "Answer", "text": "In versions 3.2.3 and 3.2.4 the most common cause is one HSN code carrying two GST rates. The utility keys the HSN summary on the code alone, so the second row collides with the first and the generator waits forever instead of raising a validation error. Split the code by rate in the workbook and import section-wise." }
-        },
-        {
-            "@type": "Question",
-            "name": "Is waiting and retrying a real fix?",
-            "acceptedAnswer": { "@type": "Answer", "text": "No. People report it working after 15-20 minutes, but that is the utility occasionally clearing its own stuck state — the same failure returns next month. Fix the cause instead, or file the return in online mode." }
-        },
-        {
-            "@type": "Question",
-            "name": "The JSON was generated but the portal says the file could not be uploaded",
-            "acceptedAnswer": { "@type": "Answer", "text": "That message is about the schema version, not the data. A JSON written by an older utility cannot be accepted by a portal expecting the current version. Do not hand-edit the version string: regenerate in the current utility, or the file will fail deeper in processing." }
-        },
-        {
-            "@type": "Question",
-            "name": "What if the utility still will not generate the file?",
-            "acceptedAnswer": { "@type": "Answer", "text": "Filing GSTR-1 in online mode on the portal is the dependable workaround: it accepts invoice details natively and needs no JSON upload. Slower for large volumes, but it cannot fail on schema." }
-        }
-    ]
-}
-    </script>
+    <script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Why does Generate File hang and never finish?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "In versions 3.2.3 and 3.2.4 the most common cause is one HSN code carrying two GST rates. The utility keys the HSN summary on the code alone, so the second row collides with the first and the generator waits forever instead of raising a validation error. Split the code by rate in the workbook and import section-wise."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is waiting and retrying a real fix?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. People report it working after 15–20 minutes, but that is the utility occasionally clearing its own stuck state — the same failure returns next month. Fix the cause, or file the return in online mode."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "The JSON was generated but the portal says the file could not be uploaded",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "That message is about the schema version, not the data. A JSON written by an older utility cannot be accepted by a portal expecting the current version. Do not hand-edit the version string — regenerate in the current utility, or the file will fail deeper in processing after the return period has started."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Do I need to reinstall the utility?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Rarely. Reinstalling clears the cache as a side effect, which is why it appears to help — the same effect is available from check 6 without losing your work. If a reinstall fixes it and the problem returns next month, you fixed the cache, not the cause."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What if none of the eight checks work?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "File GSTR-1 in online mode on the portal: it accepts invoice details natively and needs no JSON upload. Slower for large volumes, but it cannot fail on schema."
+      }
+    }
+  ]
+}</script>
     <!-- Cloudflare Web Analytics (cookieless) -->
     <script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "2e420e4568214ef084b96222d60db4cd"}'></script>
 </head>
@@ -130,7 +148,7 @@
     <section class="faq-section">
         <div class="container">
             <h2 class="section-title-center">Frequently Asked Questions</h2>
-            <div class="faq-list" style="max-width:680px;margin:0 auto;">
+            <div class="faq-list faq-wrap">
                 <details class="faq-item"><summary>Why does Generate File hang and never finish?</summary><p>In versions 3.2.3 and 3.2.4 the most common cause is one HSN code carrying two GST rates. The utility keys the HSN summary on the code alone, so the second row collides with the first and the generator waits forever instead of raising a validation error. Split the code by rate in the workbook and import section-wise.</p></details>
                 <details class="faq-item"><summary>Is waiting and retrying a real fix?</summary><p>No. People report it working after 15–20 minutes, but that is the utility occasionally clearing its own stuck state — the same failure returns next month. Fix the cause, or file the return in online mode.</p></details>
                 <details class="faq-item"><summary>The JSON was generated but the portal says the file could not be uploaded</summary><p>That message is about the schema version, not the data. A JSON written by an older utility cannot be accepted by a portal expecting the current version. Do not hand-edit the version string — regenerate in the current utility, or the file will fail deeper in processing after the return period has started.</p></details>
