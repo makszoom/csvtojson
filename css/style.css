@@ -1071,3 +1071,36 @@ main.container {
     .summary-table { font-size: 12px; }
     .summary-table th, .summary-table td { padding: 8px 10px; }
 }
+
+/* ── Унификация лендингов (17.11.2026) ────────────────────────────────────
+   Одинаковые стили были прописаны инлайном по 10 раз, причём с расхождениями:
+   кнопки имели padding 16px и 14px, отступ сверху 24px и 18px. Собрано в классы. */
+.faq-wrap {
+    max-width: 680px;
+    margin: 0 auto;
+}
+.cta-block {
+    text-align: center;
+    margin: 40px 0;
+}
+.cta-block .btn-primary,
+.btn-landing {
+    display: inline-block;
+    width: auto;
+    padding: 16px 32px;
+    text-decoration: none;
+}
+.btn-landing-tight {
+    display: inline-block;
+    width: auto;
+    padding: 16px 32px;
+    text-decoration: none;
+    margin-top: 18px;
+}
+.btn-landing-spaced {
+    display: inline-block;
+    width: auto;
+    padding: 16px 32px;
+    text-decoration: none;
+    margin-top: 24px;
+}
