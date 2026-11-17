@@ -1104,3 +1104,17 @@ main.container {
     text-decoration: none;
     margin-top: 24px;
 }
+
+/* Контейнер прокрутки для контентных таблиц.
+   Без него 7-колоночная таблица на экране 390px растягивала всю страницу
+   до 647px: горизонтальный скролл появлялся у body, а не у таблицы. */
+.seo-table-wrap {
+    max-width: 680px;
+    margin: 20px auto;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+.seo-table-wrap .seo-table {
+    margin: 0;
+    min-width: 560px;
+}
