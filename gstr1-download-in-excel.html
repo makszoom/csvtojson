@@ -10,13 +10,13 @@
     <link rel="stylesheet" href="css/style.css">
 
     <meta property="og:title" content="GSTR-1 Download in Excel — Three Ways, No Upload">
-    <meta property="og:description" content="The portal gives you JSON. Three routes to a spreadsheet, compared honestly, including one that never uploads the file.">
+    <meta property="og:description" content="The portal exports GSTR-1 as JSON, not Excel. Three ways to get it into a spreadsheet — including one that keeps the client&#x27;s file on your own machine.">
     <meta property="og:url" content="https://csv-to-json.com/gstr1-download-in-excel">
     <meta property="og:type" content="article">
 
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="GSTR-1 Download in Excel — Three Ways, No Upload">
-    <meta name="twitter:description" content="The portal gives you JSON. Three routes to a spreadsheet, compared honestly.">
+    <meta name="twitter:description" content="The portal exports GSTR-1 as JSON, not Excel. Three ways to get it into a spreadsheet — including one that keeps the client&#x27;s file on your own machine.">
 
     <script type="application/ld+json">
 {
@@ -62,7 +62,7 @@
         <div class="container">
             <h1>GSTR-1 Download<br><span class="hero-accent">in Excel</span></h1>
             <p class="hero-subtitle">The portal exports JSON, not a spreadsheet. Three ways to turn that file into something you can foot — compared honestly, including the one that never uploads your client's return.</p>
-            <p class="hero-subtitle"><a class="btn-primary" href="gstr1-json-to-excel.html" style="display:inline-block;margin-top:18px;text-decoration:none;">Open the browser-side converter</a></p>
+            <p class="hero-subtitle"><a class="btn-primary" href="gstr1-json-to-excel.html" class="btn-landing-tight">Open the browser-side converter</a></p>
         </div>
     </section>
 
@@ -110,7 +110,7 @@
     <section class="faq-section">
         <div class="container">
             <h2 class="section-title-center">Frequently Asked Questions</h2>
-            <div class="faq-list" style="max-width:680px;margin:0 auto;">
+            <div class="faq-list faq-wrap">
                 <details class="faq-item"><summary>Can I download GSTR-1 directly as Excel from the portal?</summary><p>Not as a single clean workbook. The portal gives you a JSON or a ZIP containing JSON. Some builds of the Offline Tool can export back to Excel, but that tool is built for preparing a return, not reading one, and its export follows its own template layout.</p></details>
                 <details class="faq-item"><summary>Which method keeps the client's data off someone else's server?</summary><p>Only the browser-side converter and Power Query. Most online GSTR-1 converters upload the file to their own server. For a client's return that means supplier GSTINs, invoice registers and turnover leave your machine.</p></details>
                 <details class="faq-item"><summary>What about Power Query in Excel?</summary><p>It works and needs no third party: Data → Get Data → From File → From JSON, then expand the nested columns. Slow for a full year, needs Office 365 or Excel 2019+, and sections must be expanded by hand.</p></details>
