@@ -5,17 +5,12 @@
 // 160 символов (172, 192, 212, 176, 164), и Google обрезал их в выдаче. Тесты
 // проверяли длину title и уникальность description, но НЕ его длину — дефект
 // прожил незамеченным. Здесь контракт зафиксирован целиком.
+//
+// Работает через общий _harness: собственный process.exit в конце файла убивал
+// процесс до summary('UNIT'), и итоговая строка всех unit-тестов не выводилась.
 const fs = require('fs');
 const path = require('path');
-
-const ROOT = path.resolve(__dirname, '..', '..');
-let passed = 0, failed = 0;
-const fail = [];
-function ok(name, cond, extra) {
-    if (cond) { passed++; }
-    else { failed++; fail.push(name); console.log('  \u2717', name, extra === undefined ? '' : String(extra).slice(0, 300)); }
-}
-const read = (f) => fs.readFileSync(path.join(ROOT, f), 'utf8');
+const { ok, read, ROOT } = require('./_harness');
 
 const PAGES = ['index.html', 'privacy.html'].concat(
     fs.readdirSync(path.join(ROOT, 'seo')).filter((f) => f.endsWith('.html')).sort().map((f) => 'seo/' + f));
@@ -127,10 +122,6 @@ for (const f of PAGES) {
     const s = read(f);
     if (!/class="seo-table"/.test(s)) continue;
     ok(`${f}: таблица лежит в контейнере прокрутки`, s.includes('class="seo-table-wrap"'));
-    ok(`${f}: .seo-table-wrap есть в CSS`,
-        fs.readFileSync(path.join(ROOT, 'css/style.css'), 'utf8').includes('.seo-table-wrap'));
+    ok(`${f}: .seo-table-wrap есть в CSS`, read('css/style.css').includes('.seo-table-wrap'));
 }
 
-console.log(`\nSEO-КОНТРАКТ: ${passed}/${passed + failed} PASS` + (failed ? `, ${failed} FAIL` : ''));
-if (failed) console.log('провалы: ' + fail.join(' | '));
-process.exit(failed ? 1 : 0);
