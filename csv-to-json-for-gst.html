@@ -175,6 +175,13 @@
     <div id="toolMount" data-variant="gst"></div>
 
     <main class="container seo-content">
+        <p class="lead-version"><b>Which version of the Offline Tool?</b> None is needed here. This
+        converter reads your Excel or CSV file directly. The GST Offline Tool is only required for
+        the portal's own JSON upload format, and its version number changes between financial years
+        &mdash; the current one always sits under Downloads &rarr; Returns Offline Tool on gst.gov.in,
+        not in blog posts or tool directories. What you get here is general-purpose JSON for your
+        ERP, accounting API or reconciliation, not a portal file.</p>
+
         <h2>Why Convert GST CSV to JSON?</h2>
         <p>The Goods and Services Tax (GST) system in India requires businesses to file regular returns (GSTR1, GSTR3B, GSTR2A). Many accounting tools and GST APIs accept JSON format for data submission. If your GST software exports data as CSV (which most do), you need it as JSON for your accounting software, ERP or API workflows.</p>
 
@@ -278,4 +285,11 @@
     <script src="js/tool-markup.js"></script>
     <script src="js/tool-embed.js"></script>
 </body>
-</html>
+</html
+    /* Ответ на длинный хвост в первом экране: аудитория приходит из поиска
+       с вопросом про версию Offline Tool (115 показов, позиция 6, CTR 5.2%).
+       Спокойная врезка, не перетягивает внимание с кнопки. */
+    .lead-version{margin:18px 0 0;padding:14px 18px;border-left:3px solid var(--accent);
+      background:rgba(30,58,95,.04);border-radius:0 8px 8px 0;font-size:15px;line-height:1.6;color:var(--ink)}
+    .lead-version b{color:var(--accent)}
+>
